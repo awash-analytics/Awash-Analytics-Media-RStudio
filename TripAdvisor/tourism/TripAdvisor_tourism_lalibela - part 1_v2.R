@@ -21,10 +21,15 @@ source("./functions/get_10Reviews.R")
 source("./functions/get_allReviews_v2.R")
 
 ## Get reviews about Lalibela, Ethiopia
-reviews_lalibela <- get_allReviews(nbr_page = 2, 
-                                   site_gCode = "480193", site_dCode = "324957", 
+reviews_lalibela <- get_allReviews(nbr_page = 2,
+                                   site_gCode = "480193", site_dCode = "324957",
                                    site_name = "Rock_Hewn_Churches_of_Lalibela", site_geoLocation = "Lalibela_Amhara_Region"
                                    )
+
+# reviews_lalibela <- get_allReviews(nbr_page = 97, 
+#                                    site_gCode = "480193", site_dCode = "324957", 
+#                                    site_name = "Rock_Hewn_Churches_of_Lalibela", site_geoLocation = "Lalibela_Amhara_Region"
+# )
 
 ## Get reviews about Axum, Ethiopia
 reviews_axum <- get_allReviews(nbr_page = 2, 
@@ -57,3 +62,4 @@ filename_reviews <- paste("./output/rawdata/reviews_TripAdvisor-", site_name, "_
 
 ## Export reviews data
 readr::write_csv(x = reviews_lalibela, path = file.path(filename_reviews))
+
