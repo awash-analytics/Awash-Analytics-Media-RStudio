@@ -176,147 +176,22 @@ In this blog post, I would like to show you how I scrapped TripAdvisor user revi
 <h4>
 The Main R Source Code
 </h4>
-<pre class="r"><code>## Install and load library
-library(xml2)         ## for read_html function
-library(rvest)        ## for all other functions important for Web Scrapping, please see documentation
-library(stringr)      ## for regex
-library(readr)        ## for import/export of data
-library(dplyr)        ## for data manipulation</code></pre>
-<pre class="r"><code>#######################################################
-## Get all reviews about Lalibela from TripAdvisor.  ##
-#######################################################
-## Main TripAdvisor URL
-TripAdvisor_url &lt;- &quot;https://www.tripadvisor.com&quot;
-
-## Load source codes used for extracting reviews
-source(&quot;./functions/get_10Reviews.R&quot;)
-source(&quot;./functions/get_allReviews.R&quot;)
-
-## Read reviews
-## -- As of today (21 Dec 2017), there are a total of 97 pages of reviews found in TripAdvisor for Lalibela
-reviews &lt;- get_allReviews(num_pages = 97)</code></pre>
+<pre class="r"><code>test</code></pre>
+<pre class="r"><code>test</code></pre>
 </div>
 <p><!-- mainRCode-area --></p>
 <div id="get_10Reviews-area">
 <h4>
 Reading the Ten (10) Reviews
 </h4>
-<pre class="r"><code>get_10Reviews &lt;- function(node) {
-  #################################################################################################################################
-  ## Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).                      
-  ## ** Source: https://github.com/hadley/rvest/issues/12
-  ## **         https://stackoverflow.com/questions/33250826/scraping-with-rvest-complete-with-nas-when-tag-is-not-present
-  ##################################################################################################################################
-  
-  ## Get current node/row
-  node_current &lt;- node
-  
-  ##########################
-  ## Extract all columns  ##
-  ##########################
-  ## review title
-  tmp_title &lt;- node_current %&gt;%
-    rvest::html_node(&quot;.noQuotes&quot;) %&gt;%
-    rvest::html_text() 
-  
-  ## review title
-  tmp_fullReview &lt;- node_current %&gt;%
-    rvest::html_node(&quot;.partial_entry&quot;) %&gt;%
-    rvest::html_text() 
-  
-  ## review date
-  tmp_date &lt;- node_current %&gt;%
-    rvest::html_node(&quot;.relativeDate&quot;) %&gt;%
-    rvest::html_text() %&gt;%
-    stringr::str_replace(pattern = &quot;(Reviewed)&quot;, replacement = &quot;&quot;) %&gt;%   ## removes the text &quot;reviews&quot;
-    stringr::str_trim() 
-  
-  ## reviewer username
-  tmp_userName &lt;- node_current %&gt;%
-    rvest::html_node(&quot;.scrname&quot;) %&gt;%
-    rvest::html_text()
-  
-  ## reviewer location
-  tmp_userLocation &lt;- node_current %&gt;%
-    rvest::html_node(css = &quot;.userLocation&quot;) %&gt;%
-    html_text()
-  
-  ## reviewer country of origin, probably a city
-  tmp_device &lt;- node_current %&gt;%
-    rvest::html_node(&quot;.viaMobile&quot;) %&gt;%
-    rvest::html_text()
-  
-  ##############################################################
-  ## Create final dataframe.                                  ##
-  ##############################################################
-  ## ** A null value is filled whenever no value is returned  ##
-  ##    from Web Scrapping step.                              ##
-  ##############################################################
-  data.frame(
-    title = ifelse(length(tmp_title) == 0, NA,       ## the IFELSE function is used to fill NA whenever HTML_NODES is not able to return a value
-                   tmp_title),
-    full_review = ifelse(length(tmp_fullReview) == 0, NA,
-                         tmp_fullReview),
-    date = ifelse(length(tmp_date) == 0, NA,
-                  tmp_date),
-    userName = ifelse(length(tmp_userName) == 0, NA,
-                      tmp_userName),
-    device = ifelse(length(tmp_device) == 0, NA,
-                    tmp_device),
-    userLocation = ifelse(length(tmp_userLocation) == 0, NA,      
-                                 tmp_userLocation),
-    stringsAsFactors=F
-  )
-}</code></pre>
+<pre class="r"><code>test</code></pre>
 </div>
 <p><!-- get_10Reviews-area --></p>
 <div id="get_allReviews-area">
 <h4>
 Looping through all pages
 </h4>
-<pre class="r"><code>get_allReviews &lt;- function(num_pages) {
-  
-  message(&quot;Page extraction is started: &quot;, date())
-  
-  ## loop through reviews page
-  for (i in 1:num_pages) {
-    
-    ## Get appropriate link for reviews
-    if (i == 1) {
-      lalibela_reviewHomePg &lt;- &quot;/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region&quot;
-      TripAdvisor_lalibela_review &lt;- paste(TripAdvisor_url, lalibela_reviewHomePg, &quot;.html&quot;, 
-                                           sep = &quot;&quot;) 
-    } 
-    else {
-      lalibela_reviewOtherPg &lt;- paste(&quot;/Attraction_Review-g480193-d324957-Reviews-or&quot;, i-1, &quot;0-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region&quot;,
-                                      sep = &quot;&quot;)
-      TripAdvisor_lalibela_review &lt;- paste(TripAdvisor_url, lalibela_reviewOtherPg, &quot;.html&quot;,
-                                           sep = &quot;&quot;)
-    }
-    
-    ## Read reviews about Lalibela from TripAdvisor website 
-    TripAdvisor_topic &lt;- xml2::read_html(TripAdvisor_lalibela_review)
-    
-    ## Get main container which contains touris reviews
-    reviewer_container &lt;- TripAdvisor_topic %&gt;%
-      html_nodes(&quot;div.review-container&quot;)
-    
-    ## Get all required columns using the EXTRACTOR function
-    reviews_data &lt;- lapply(X = reviewer_container, get_10Reviews) %&gt;%
-      dplyr::bind_rows()
-    
-    if (i == 1) {
-      reviews_dataAll = data.frame(page_nbr = i, reviews_data)
-    } else {
-      reviews_dataAll &lt;- rbind(reviews_dataAll, 
-                               data.frame(page_nbr = i, reviews_data))
-    }
-  }
-  
-  message(&quot;Page extraction is completed: &quot;, date())
-  
-  return(reviews_dataAll)
-}</code></pre>
+<pre class="r"><code>test</code></pre>
 </div>
 <p><!-- get_allReviews-area --></p>
 <pre class="r"><code>test</code></pre>
