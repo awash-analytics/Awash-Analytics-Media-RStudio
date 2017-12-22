@@ -172,18 +172,18 @@ div.myCaption {
 <!-- <h4>1. Introduction</h4> -->
 <h2 id="introduction">Introduction</h2>
 <p>
-In this article I explain how I managed to scrape <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> for reviews of tourists about attraction sites (e.g., Lalibel, Ethiopia and Louvre museum, Paris). The R program manages to grab review details such as date of review, reviewer country, title (which is interesting for Sentiment Analysis), device (via Mobile device or not), etc. Let’s get started.
+In this article I explain how I managed to scrape <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> reviews for attraction sites (e.g., Lalibela, Ethiopia and Louvre museum, Paris). The R program manages to scape important review attributes such as review title, date, device (used to post a review, e.g., mobile), and reviewer’s country of residence. The title, for example, is an interesting attribute to perform a sentiment analysis. Let’s get started.
 </p>
 </div>
 <p><!-- end introduction --></p>
 <div id="get_10Reviews-area">
 <!-- <h4>2. Scraping TripAdvisor Review Components</h4> -->
-<h2 id="scraping-tripadvisor-review-components">Scraping TripAdvisor Review Components</h2>
+<h2 id="scraping-the-main-attributes">Scraping the Main Attributes</h2>
 <p>
-<p>The <code>get_10Reviews</code> function extracts the required components / attributes of a review such as review title, description, date, name, location, and device. For the CSS selector, I used a tool called <a target="_blank" href="https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=en">SelectorGadget</a>. For the web scraping part I used mainly the <code>rvest</code> package - Thanks to Hadley Wickham.</p>
+<p>The <code>get_10Reviews()</code> function shown below extracts the required components / attributes of a review such as review title, description, date, name, location, and device. For the CSS selector, I used a tool called <a target="_blank" href="https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=en">SelectorGadget</a>. For the web scraping part I mainly used the <code>rvest</code> package - Thanks to Hadley Wickham!</p>
 <p>The <code>get_10Reviews</code> function has one argument called “node”. This represents a single review given by the user, and its value is set by the other program which will be discussed later.</p>
-<p>For text processing I used functions available in the <code>stringr</code> package. When I scrape the review date, for example, an extra character (“Reviewed”) was included. Thus, as shown in the code below I used <code>stringr::str_replace</code> function to remove the extra string.</p>
-The <code>rvest</code> package returns “0” when no value is returned from the web. That is the reason for using the <code>ifelse</code> function in the last part of the code below. This will help you to get the same number of reviews. Otherwise, less number of reviews will be extracted because of missing values. I hope this issue will be resolved by the developer of the <code>rvest</code> package soon.
+<p>For text processing I used the <code>stringr</code> package. When I scrape the review date, for example, an extra character (“Reviewed”) was returned togther with the review date Thus, as shown in the code below I used <code>stringr::str_replace</code> function to remove the extra string as we’re only interested with the date.</p>
+The <code>rvest</code> package returns “0” when no value is returned from the web (e.g., the user’s country of residence is not filled in his/her profile). That is the reason for using the <code>ifelse</code> function in the last part of the code below. This ensures that the number of reviews posted in the TripAdvisor site and the one read by R is the same. Otherwise, less number of reviews will be read by R because of the missing attributes. I hope this issue will be resolved by the developer of the <code>rvest</code> package soon.
 </p>
 <div class="myCaption">
 <p><em>Code 1: The R program responsible for grabbing the required components of a given review (e.g., reviewer title, date, device, location, etc).</em></p>
@@ -270,11 +270,11 @@ get_10Reviews &lt;- function(node) {
 <p><!-- get_10Reviews-area --></p>
 <div id="get_allReviews-area">
 <!-- <h4>3. How to scrap all reviews (in a page or multiple pages)?</h4> -->
-<h2 id="how-to-scrap-all-reviews-in-a-page-or-multiple-pages">How to scrap all reviews (in a page or multiple pages)?</h2>
+<h2 id="scraping-all-reviews">Scraping All Reviews</h2>
 <p>
-<p>The above code handles an individual review at a time and extracts the required attributes of the review. However, there are a total of ten (10) reviews per page. For example, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a>.</p>
-<p>The <code>get_allReviews</code> function handles grabing reviews from a single page or multiple pages. The user of the function can specify the number of pages to scrape using the “nbr_page” argument.</p>
-The values of the other arguments (such as “site_gCode”, “site_dCode”, “site_name”, and “site_geoLocation”) are available for you in url of the attraction site. For <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a> attraction site, for example, the values are defined as: <code>site_gCode = &quot;480193&quot;</code>, <code>site_dCode = &quot;324957&quot;</code>, <code>site_name = &quot;Rock_Hewn_Churches_of_Lalibela&quot;</code>, and <code>site_geoLocation = &quot;Lalibela_Amhara_Region&quot;</code>. In the application section different attraction sites are used for demonstration purpose (e.g., Louvre museum, Paris and Mount Kenya, Kenya).
+<p>The above code handles an individual review at a time and extracts the required attributes of the review. However, there are a total of ten (10) reviews per page. For example, see here <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a>.</p>
+<p>The <code>get_allReviews()</code> function shown below is developed to loop through the required number of pages. The number of pages is set by the user using the “nbr_page” argument of the function.</p>
+The values of the other arguments (such as “site_gCode”, “site_dCode”, “site_name”, and “site_geoLocation”) are available for you in the url of the attraction site that you’re interested to grab reviews from. For <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a> attraction site, for example, the parameter values will be: <code>site_gCode = &quot;480193&quot;</code>, <code>site_dCode = &quot;324957&quot;</code>, <code>site_name = &quot;Rock_Hewn_Churches_of_Lalibela&quot;</code>, and <code>site_geoLocation = &quot;Lalibela_Amhara_Region&quot;</code>. In the application section, I used different attraction sites (e.g., Louvre museum, Paris and Mount Kenya, Kenya) to show you usage of the R programs and how to set the input parameters.
 </p>
 <div class="myCaption">
 <p><em>Code 2: The R program responsible for grabbing all reviews available in a single page or multiple pages.</em></p>
@@ -402,10 +402,10 @@ get_allReviews &lt;- function(nbr_page = NULL,
 <!-- <h4>4. Application</h4> -->
 <h2 id="application">Application</h2>
 <p>
-Now I’ll explain usage of the functions I built for scraping <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> using four attraction sites such as <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">Louvre museum - Paris</a>, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">Mount Kenya - Kenya</a>, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g3667784-d324991-Reviews-The_Ruins_of_Aksum-Axum_Tigray_Region.html">Axum - Ethiopia</a>, and <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>.
-</p>
+<p>Now I’ll explain usage of the functions I built for scraping <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> using three attraction sites such as <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">Louvre museum - Paris</a> and <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">Mount Kenya - Kenya</a>.</p>
+<p>As shown in the code below, the dependence packages should be installed and loaded. Then, the two R source codes (i.e., <code>get_10Reviews.R</code> and <code>get_allReviews_v2.R</code>) should be loaded to R using the <code>source()</code> function. Now the scraper functions I discussed before are ready for use.</p>
 <div class="myCaption">
-<p><em>Code 3: The main R program which shows usage of the custom functions. For demonstration purpose, four attraction sites are selected: Lalibela, Axum, Mount Kenya and Louvre museum.</em></p>
+<p><em>Code 3: The main R program which shows usage of the scraper functions. For demonstration purpose, three attraction sites are selected: Lalibela, Louvre museum and Mount Kenya.</em></p>
 </div>
 <pre class="r"><code>################################
 ## Environmental settings.    ##
@@ -427,7 +427,7 @@ options(knitr.table.format = &quot;html&quot;)
 ###################################################
 ## Reading reviews of an attraction site.       ##
 ###################################################
-## Load custom source codes
+## Load scraper source codes
 source(&quot;./functions/get_10Reviews.R&quot;)
 source(&quot;./functions/get_allReviews_v2.R&quot;)
 
@@ -437,9 +437,10 @@ reviews_lalibela &lt;- get_allReviews(nbr_page = 2,
                                    site_name = &quot;Rock_Hewn_Churches_of_Lalibela&quot;, 
                                    site_geoLocation = &quot;Lalibela_Amhara_Region&quot;
                                    )</code></pre>
+I’ll first show how I scraped <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>. The url of Lalibela is: <a href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html" class="uri">https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html</a>. The url has everything we need to run the scraper function. As shown in the code above, the input parameters are set to the following values: <code>site_gCode = &quot;480193&quot;</code>, <code>site_dCode = &quot;324957&quot;</code>, <code>site_name = &quot;Rock_Hewn_Churches_of_Lalibela&quot;</code>, and <code>site_geoLocation = &quot;Lalibela_Amhara_Region&quot;</code>.
+</p>
 <p>
-<p>For demonstration purpose, I selected four attraction sites such as Lalibela and Axum (found in Ethiopia, Africa), Mount Kenya (Kenya, Africa), and Louvre museum (Paris, France).</p>
-Here is the link with all reviews about Lalibela which is one of the most famous tourist destination found in Ethiopia, Africa: <a href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html" class="uri">https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html</a>
+The above code returns the result shown below in Table 1 after scraping <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>. Only eight (8) out of twenty (20) records are displayed in the table. The first reviewer was from Colorado, USA who posted his/her review via mobile device four days ago. The last reviewer was from UK and he/she posted her review on 22 October 2017 using other devices (e.g., laptop). A total of 1,434 reviews has been posted on <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a>.
 </p>
 <div class="myCaption">
 <p><em>Table 1. Tourist reviews about Lalibela, Ethiopia.</em></p>
@@ -657,17 +658,23 @@ Greater London, United Kingdom
 </tr>
 </tbody>
 </table>
+<p>
+The second attraction site I used for this article is <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">Louvre museum - Paris</a>. Who doesn’t know Mona Lisa? This is the url used by TripAdvisor to store tourist reviews about Louvre museum: <a href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html" class="uri">https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html</a>. As shown in the function call below, values that are set for the input parameters are exactly the same as we see in the url.
+</p>
 <div class="myCaption">
-<p><em>Code 4: Reading TripAdvisor for reviews about Axum, Ethiopia.</em></p>
+<p><em>Code 4: Reading TripAdvisor reviews about Louvre museum, France.</em></p>
 </div>
-<pre class="r"><code>## Get reviews about Axum, Ethiopia
-reviews_axum &lt;- get_allReviews(nbr_page = 2, 
-                               site_gCode = &quot;3667784&quot;, site_dCode = &quot;324991&quot;, 
-                               site_name = &quot;The_Ruins_of_Aksum&quot;, 
-                               site_geoLocation = &quot;Axum_Tigray_Region&quot;
-                               )</code></pre>
+<pre class="r"><code>## Get reviews about Louvre Museum, Paris, France
+reviews_louvreMuseum &lt;- get_allReviews(nbr_page = 2, 
+                                       site_gCode = &quot;187147&quot;, site_dCode = &quot;188757&quot;, 
+                                       site_name = &quot;Louvre_Museum&quot;, 
+                                       site_geoLocation = &quot;Paris_Ile_de_France&quot;
+                                       )</code></pre>
+<p>
+Table 4 below shows part of the reviews that was scraped from TripAdvisor about Louvre museum, Paris, France. The first reviewer was from New Delhi, India and the review was posted yesterday. The last reviewer was from Melbourne, Australia. A total of 80,774 reviews has ben posted on <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">TripAdvisor - Louvre museum</a>.
+</p>
 <div class="myCaption">
-<p><em>Table 2. Tourist reviews about Axum, Ethiopia.</em></p>
+<p><em>Table 4. Tourist reviews about Louvre museum, France.</em></p>
 </div>
 <table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
 <thead>
@@ -698,192 +705,195 @@ user_location
 <tbody>
 <tr>
 <td style="text-align:left;">
-Axum, Ethiopia
+99 rue de Rivoli, 75001 Paris, France
 </td>
 <td style="text-align:right;">
-204
+80774
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:left;">
-Axum - Top drawer Guide
+Mona Lisa
 </td>
 <td style="text-align:left;">
-3 weeks ago
+yesterday
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Coquitlam, BC
+New Delhi, India
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Axum, Ethiopia
+99 rue de Rivoli, 75001 Paris, France
 </td>
 <td style="text-align:right;">
-204
+80774
 </td>
 <td style="text-align:right;">
 1
 </td>
 <td style="text-align:left;">
-History
+Awesome place - must visit!
 </td>
 <td style="text-align:left;">
-4 weeks ago
+yesterday
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Chennai
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80774
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+SO much art, So little time
+</td>
+<td style="text-align:left;">
+yesterday
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+London, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80774
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Magnifigue! With 7 year olds.
+</td>
+<td style="text-align:left;">
+yesterday
 </td>
 <td style="text-align:left;">
 via mobile
 </td>
 <td style="text-align:left;">
-NA
+Richmond, Virginia
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Axum, Ethiopia
+99 rue de Rivoli, 75001 Paris, France
 </td>
 <td style="text-align:right;">
-204
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-History
-</td>
-<td style="text-align:left;">
-November 3, 2017
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Axum, Ethiopia
-</td>
-<td style="text-align:right;">
-204
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Must See!
-</td>
-<td style="text-align:left;">
-October 12, 2017
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Bage, RS
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Axum, Ethiopia
-</td>
-<td style="text-align:right;">
-204
+80774
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:left;">
-fascinating
+Art eveywhere, fantastic!
 </td>
 <td style="text-align:left;">
-February 21, 2017
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Modiin, Israel
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Axum, Ethiopia
-</td>
-<td style="text-align:right;">
-204
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Interesting, filled with history.
-</td>
-<td style="text-align:left;">
-February 19, 2017
+2 days ago
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-Elmhurst, Illinois
+Paris, France
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-Axum, Ethiopia
+99 rue de Rivoli, 75001 Paris, France
 </td>
 <td style="text-align:right;">
-204
+80774
 </td>
 <td style="text-align:right;">
 2
 </td>
 <td style="text-align:left;">
-very intersting historical archeologicl site
+Overwhelming and amazing
 </td>
 <td style="text-align:left;">
-January 3, 2017
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Herzliya, Israel
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-Axum, Ethiopia
-</td>
-<td style="text-align:right;">
-204
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Worth seeing, particularly the museum
-</td>
-<td style="text-align:left;">
-January 3, 2017
+2 days ago
 </td>
 <td style="text-align:left;">
 via mobile
 </td>
 <td style="text-align:left;">
+Sydney, Australia
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80774
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+An experience !
+</td>
+<td style="text-align:left;">
+2 days ago
+</td>
+<td style="text-align:left;">
 NA
+</td>
+<td style="text-align:left;">
+Singapore, Singapore
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80774
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Stunning
+</td>
+<td style="text-align:left;">
+2 days ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Melbourne, Australia
 </td>
 </tr>
 </tbody>
 </table>
+<p>
+Finally, let’s take our flight from Paris to Kenya and try to understand the impression of tourists about <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">Mount Kenya - Kenya</a>. The url of Mount Kenya in TripAdvisor is: <a href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html" class="uri">https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html</a>.
+</p>
 <div class="myCaption">
-<p><em>Code 5: Reading TripAdvisor for reviews about Mount Kenya, Kenya</em></p>
+<p><em>Code 5: Reading TripAdvisor reviews about Mount Kenya, Kenya</em></p>
 </div>
 <pre class="r"><code>## Get reviews about Mount Kenya, Kenya
 reviews_mountKenya &lt;- get_allReviews(nbr_page = 2, 
@@ -891,6 +901,9 @@ reviews_mountKenya &lt;- get_allReviews(nbr_page = 2,
                                      site_name = &quot;Mount_Kenya&quot;, 
                                      site_geoLocation = &quot;Mount_Kenya_National_Park&quot;
                                      )</code></pre>
+<p>
+As shown in the last column of Table 3, it’s interesting to see that tourists come to Mount Kenya from all over the world, ranging from Cairo, Egypt to Copenhagen, Denmark and to Ghent, Belgium. A total of 352 reviews has been posted on <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">TripAdvisor - Mount Kenya</a>.
+</p>
 <div class="myCaption">
 <p><em>Table 3. Tourist reviews about Mount Kenya, Kenya.</em></p>
 </div>
@@ -1107,254 +1120,16 @@ kenya
 </tr>
 </tbody>
 </table>
-<div class="myCaption">
-<p><em>Code 4: Reading TripAdvisor for reviews about Louvre museum, France.</em></p>
-</div>
-<pre class="r"><code>## Get reviews about Louvre Museum, Paris, France
-reviews_louvreMuseum &lt;- get_allReviews(nbr_page = 2, 
-                                       site_gCode = &quot;187147&quot;, site_dCode = &quot;188757&quot;, 
-                                       site_name = &quot;Louvre_Museum&quot;, 
-                                       site_geoLocation = &quot;Paris_Ile_de_France&quot;
-                                       )</code></pre>
-<div class="myCaption">
-<p><em>Table 4. Tourist reviews about Louvre museum, France.</em></p>
-</div>
-<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:left;">
-attraction_location
-</th>
-<th style="text-align:right;">
-total_reviews
-</th>
-<th style="text-align:right;">
-page_nbr
-</th>
-<th style="text-align:left;">
-title
-</th>
-<th style="text-align:left;">
-date
-</th>
-<th style="text-align:left;">
-user_device
-</th>
-<th style="text-align:left;">
-user_location
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-SO much art, So little time
-</td>
-<td style="text-align:left;">
-yesterday
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-London, United Kingdom
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Magnifigue! With 7 year olds.
-</td>
-<td style="text-align:left;">
-yesterday
-</td>
-<td style="text-align:left;">
-via mobile
-</td>
-<td style="text-align:left;">
-Richmond, Virginia
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Love the Louvre
-</td>
-<td style="text-align:left;">
-yesterday
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Love love love!!!
-</td>
-<td style="text-align:left;">
-yesterday
-</td>
-<td style="text-align:left;">
-via mobile
-</td>
-<td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-An experience !
-</td>
-<td style="text-align:left;">
-2 days ago
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Singapore, Singapore
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Stunning
-</td>
-<td style="text-align:left;">
-2 days ago
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-Melbourne, Australia
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-theSouthAfricanreview
-</td>
-<td style="text-align:left;">
-3 days ago
-</td>
-<td style="text-align:left;">
-via mobile
-</td>
-<td style="text-align:left;">
-Libreville, Gabon
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-99 rue de Rivoli, 75001 Paris, France
-</td>
-<td style="text-align:right;">
-80772
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Huge place
-</td>
-<td style="text-align:left;">
-3 days ago
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-New York City, New York
-</td>
-</tr>
-</tbody>
-</table>
 </div>
 <p><!-- end main-application-area --></p>
-<div id="export-rawdata">
 <!-- <h4>5. Conclusion</h4> -->
-<h2 id="conclusion">Conclusion</h2>
-<div class="myCaption">
-<p><em>Code 5: Export reviews rawdata for future analysis such as sentiment analysis and visualization.</em></p>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>
+<p>I hope you find this article useful. I also believe that with a minor modification the same source code can be used to scrap reviews about other services such as restaurant, hotel, etc.</p>
+Good luck and Happy to hear your opinion. Thanks!
+</p>
 </div>
-<pre class="r"><code>#######################################################
-## Export final reviews data as a CSV file format.   ##
-#######################################################
-## Define filename
-site_name &lt;- &quot;lalibela&quot;
-filename_reviews &lt;- paste(&quot;./output/rawdata/reviews_TripAdvisor-&quot;, site_name, &quot;_&quot;,
-                          format(Sys.Date(), format=&quot;%B_%d_%Y&quot;), 
-                          &quot;.csv&quot;, 
-                          sep = &quot;&quot;)
-
-## Export reviews data
-readr::write_csv(x = reviews_lalibela, path = file.path(filename_reviews))</code></pre>
-</div>
-<p><!-- end export-rawdata --></p>
-<pre class="r"><code>test</code></pre>
 
 
 

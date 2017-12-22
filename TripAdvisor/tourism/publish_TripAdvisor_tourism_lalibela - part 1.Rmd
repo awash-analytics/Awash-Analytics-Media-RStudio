@@ -60,23 +60,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Introduction
 
 <p>
-In this article I explain how I managed to scrape <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> for reviews of tourists about attraction sites (e.g., Lalibel, Ethiopia and Louvre museum, Paris). The R program manages to grab review details such as date of review, reviewer country, title (which is interesting for Sentiment Analysis), device (via Mobile device or not), etc. Let's get started.
+In this article I explain how I managed to scrape <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> reviews for attraction sites (e.g., Lalibela, Ethiopia and Louvre museum, Paris). The R program manages to scape important review attributes such as review title, date, device (used to post a review, e.g., mobile), and reviewer's country of residence. The title, for example, is an interesting attribute to perform a sentiment analysis. Let's get started.
 </p>
 
 </div> <!-- end introduction -->
 
 <div id="get_10Reviews-area">
 <!-- <h4>2. Scraping TripAdvisor Review Components</h4> -->
-## Scraping Review Attributes
+## Scraping the Main Attributes
 
 <p>
-The ``get_10Reviews`` function extracts the required components / attributes of a review such as review title, description, date, name, location, and device. For the CSS selector, I used a tool called <a target="_blank" href="https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=en">SelectorGadget</a>. For the web scraping part I used mainly the ``rvest`` package - Thanks to Hadley Wickham. 
+The ``get_10Reviews()`` function shown below extracts the required components / attributes of a review such as review title, description, date, name, location, and device. For the CSS selector, I used a tool called <a target="_blank" href="https://chrome.google.com/webstore/detail/selectorgadget/mhjhnkcfbdhnjickkkdbjoemdmbfginb?hl=en">SelectorGadget</a>. For the web scraping part I mainly used the ``rvest`` package - Thanks to Hadley Wickham!
 
 The ``get_10Reviews`` function has one argument called "node". This represents a single review given by the user, and its value is set by the other program which will be discussed later.
 
-For text processing I used functions available in the ``stringr`` package. When I scrape the review date, for example, an extra character ("Reviewed") was included. Thus, as shown in the code below I used ``stringr::str_replace`` function to remove the extra string. 
+For text processing I used the ``stringr`` package. When I scrape the review date, for example, an extra character ("Reviewed") was returned togther with the review date Thus, as shown in the code below I used ``stringr::str_replace`` function to remove the extra string as we're only interested with the date.
 
-The ``rvest`` package returns "0" when no value is returned from the web. That is the reason for using the ``ifelse`` function in the last part of the code below. This will help you to get the same number of reviews. Otherwise, less number of reviews will be extracted because of missing values. I hope this issue will be resolved by the developer of the ``rvest`` package soon.
+The ``rvest`` package returns "0" when no value is returned from the web (e.g., the user's country of residence is not filled in his/her profile). That is the reason for using the ``ifelse`` function in the last part of the code below. This ensures that the number of reviews posted in the TripAdvisor site and the one read by R is the same. Otherwise, less number of reviews will be read by R because of the missing attributes. I hope this issue will be resolved by the developer of the ``rvest`` package soon.
 </p>
 
 <div class="myCaption">
@@ -167,14 +167,14 @@ get_10Reviews <- function(node) {
 
 <div id="get_allReviews-area">
 <!-- <h4>3. How to scrap all reviews (in a page or multiple pages)?</h4> -->
-## How to scrap all reviews (in a page or multiple pages)?
+## Scraping All Reviews
 
 <p>
-The above code handles an individual review at a time and extracts the required attributes of the review. However, there are a total of ten (10) reviews per page. For example, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a>. 
+The above code handles an individual review at a time and extracts the required attributes of the review. However, there are a total of ten (10) reviews per page. For example, see here <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a>. 
 
-The ``get_allReviews`` function handles grabing reviews from a single page or multiple pages. The user of the function can specify the number of pages to scrape using the "nbr_page" argument. 
+The ``get_allReviews()`` function shown below is developed to loop through the required number of pages. The number of pages is set by the user using the "nbr_page" argument of the function. 
 
-The values of the other arguments (such as "site_gCode", "site_dCode", "site_name", and "site_geoLocation") are available for you in url of the attraction site. For <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a> attraction site, for example, the values are defined as: ``site_gCode = "480193"``, ``site_dCode = "324957"``, ``site_name = "Rock_Hewn_Churches_of_Lalibela"``, and ``site_geoLocation = "Lalibela_Amhara_Region"``. In the application section different attraction sites are used for demonstration purpose (e.g., Louvre museum, Paris and Mount Kenya, Kenya).
+The values of the other arguments (such as "site_gCode", "site_dCode", "site_name", and "site_geoLocation") are available for you in the url of the attraction site that you're interested to grab reviews from. For <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a> attraction site, for example, the parameter values will be: ``site_gCode = "480193"``, ``site_dCode = "324957"``, ``site_name = "Rock_Hewn_Churches_of_Lalibela"``, and ``site_geoLocation = "Lalibela_Amhara_Region"``. In the application section, I used different attraction sites (e.g., Louvre museum, Paris and Mount Kenya, Kenya) to show you usage of the R programs and how to set the input parameters. 
 </p>
 
 
@@ -309,12 +309,12 @@ get_allReviews <- function(nbr_page = NULL,
 ## Application
 
 <p>
-Now I'll explain usage of the functions I built for scraping <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> using four attraction sites such as <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">Louvre museum - Paris</a>, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">Mount Kenya - Kenya</a>, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g3667784-d324991-Reviews-The_Ruins_of_Aksum-Axum_Tigray_Region.html">Axum - Ethiopia</a>, and <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>.
-</p>
+Now I'll explain usage of the functions I built for scraping <a target="_blank" href="https://www.tripadvisor.com/Attractions">TripAdvisor</a> using three attraction sites such as <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>, <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">Louvre museum - Paris</a> and <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">Mount Kenya - Kenya</a>.
 
+As shown in the code below, the dependence packages should be installed and loaded. Then, the two R source codes (i.e., ``get_10Reviews.R`` and ``get_allReviews_v2.R``) should be loaded to R using the ``source()`` function. Now the scraper functions I discussed before are ready for use.
 
 <div class="myCaption">
-*Code 3: The main R program which shows usage of the custom functions. For demonstration purpose, four attraction sites are selected: Lalibela, Axum, Mount Kenya and Louvre museum.*
+*Code 3: The main R program which shows usage of the scraper functions. For demonstration purpose, three attraction sites are selected: Lalibela, Louvre museum and Mount Kenya.*
 </div>
 
 ```{r, eval=TRUE, message=F, warning=F}
@@ -338,7 +338,7 @@ options(knitr.table.format = "html")
 ###################################################
 ## Reading reviews of an attraction site.       ##
 ###################################################
-## Load custom source codes
+## Load scraper source codes
 source("./functions/get_10Reviews.R")
 source("./functions/get_allReviews_v2.R")
 
@@ -350,11 +350,11 @@ reviews_lalibela <- get_allReviews(nbr_page = 2,
                                    )
 ```
 
-<p>
-For demonstration purpose, I selected four attraction sites such as Lalibela and Axum (found in Ethiopia, Africa), Mount Kenya (Kenya, Africa), and Louvre museum (Paris, France).
+I'll first show how I scraped <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>. The url of Lalibela is: <https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html>. The url has everything we need to run the scraper function. As shown in the code above, the input parameters are set to the following values: ``site_gCode = "480193"``, ``site_dCode = "324957"``, ``site_name = "Rock_Hewn_Churches_of_Lalibela"``, and ``site_geoLocation = "Lalibela_Amhara_Region"``.   
+</p>
 
-Here is the link with all reviews about Lalibela which is one of the most famous tourist destination found in Ethiopia, Africa:
-<https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html>
+<p>
+The above code returns the result shown below in Table 1 after scraping <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">Lalibela - Ethiopia</a>. Only eight (8) out of twenty (20) records are displayed in the table. The first reviewer was from Colorado, USA who posted his/her review via mobile device four days ago. The last reviewer was from UK and he/she posted her review on 22 October 2017 using other devices (e.g., laptop). A total of 1,434 reviews has been posted on <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html">TripAdvisor - Lalibela</a>. 
 </p>
 
 <div class="myCaption">
@@ -366,52 +366,12 @@ knitr::kable(psych::headTail(reviews_lalibela[, c("attraction_location",  "total
                                                   full_width = T, position = "left"))
 ```
 
-<div class="myCaption">
-*Code 4: Reading TripAdvisor for reviews about Axum, Ethiopia.*
-</div>
-```{r, eval=TRUE, message=F}
-## Get reviews about Axum, Ethiopia
-reviews_axum <- get_allReviews(nbr_page = 2, 
-                               site_gCode = "3667784", site_dCode = "324991", 
-                               site_name = "The_Ruins_of_Aksum", 
-                               site_geoLocation = "Axum_Tigray_Region"
-                               )
-```
+<p>
+The second attraction site I used for this article is <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">Louvre museum - Paris</a>. Who doesn't know Mona Lisa? This is the url used by TripAdvisor to store tourist reviews about Louvre museum: <https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html>. As shown in the function call below, values that are set for the input parameters are exactly the same as we see in the url. 
+</p>
 
 <div class="myCaption">
-*Table 2. Tourist reviews about Axum, Ethiopia.*
-</div>
-```{r, eval=TRUE, message=F, echo=FALSE}
-knitr::kable(psych::headTail(reviews_axum[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F) %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
-                                                  full_width = T, position = "left"))
-```
-
-<div class="myCaption">
-*Code 5: Reading TripAdvisor for reviews about Mount Kenya, Kenya*
-</div>
-```{r, eval=TRUE, message=F}
-## Get reviews about Mount Kenya, Kenya
-reviews_mountKenya <- get_allReviews(nbr_page = 2, 
-                                     site_gCode = "319715", site_dCode = "1936998", 
-                                     site_name = "Mount_Kenya", 
-                                     site_geoLocation = "Mount_Kenya_National_Park"
-                                     )
-```
-
-
-<div class="myCaption">
-*Table 3. Tourist reviews about Mount Kenya, Kenya.*
-</div>
-```{r, eval=TRUE, message=F, echo=FALSE}
-knitr::kable(psych::headTail(reviews_mountKenya[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F) %>%
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
-                                                  full_width = T, position = "left"))
-```
-
-
-<div class="myCaption">
-*Code 4: Reading TripAdvisor for reviews about Louvre museum, France.*
+*Code 4: Reading TripAdvisor reviews about Louvre museum, France.*
 </div>
 ```{r, eval=TRUE, message=F}
 ## Get reviews about Louvre Museum, Paris, France
@@ -422,6 +382,10 @@ reviews_louvreMuseum <- get_allReviews(nbr_page = 2,
                                        )
 ```
 
+<p>
+Table 4 below shows part of the reviews that was scraped from TripAdvisor about Louvre museum, Paris, France. The first reviewer was from New Delhi, India and the review was posted yesterday. The last reviewer was from Melbourne, Australia. A total of 80,774 reviews has ben posted on <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html">TripAdvisor - Louvre museum</a>.
+</p>
+
 <div class="myCaption">
 *Table 4. Tourist reviews about Louvre museum, France.*
 </div>
@@ -431,37 +395,43 @@ knitr::kable(psych::headTail(reviews_louvreMuseum[, c("attraction_location",  "t
                                                   full_width = T, position = "left"))
 ```
 
-</div>  <!-- end main-application-area -->
-
-<div id="export-rawdata">
-<!-- <h4>5. Conclusion</h4> -->
-## Conclusion
+<p>
+Finally, let's take our flight from Paris to Kenya and try to understand the impression of tourists about <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">Mount Kenya - Kenya</a>. The url of Mount Kenya in TripAdvisor is: <https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html>.
+</p>
 
 <div class="myCaption">
-*Code 5: Export reviews rawdata for future analysis such as sentiment analysis and visualization.*
+*Code 5: Reading TripAdvisor reviews about Mount Kenya, Kenya*
 </div>
-```{r, eval=FALSE}
-#######################################################
-## Export final reviews data as a CSV file format.   ##
-#######################################################
-## Define filename
-site_name <- "lalibela"
-filename_reviews <- paste("./output/rawdata/reviews_TripAdvisor-", site_name, "_",
-                          format(Sys.Date(), format="%B_%d_%Y"), 
-                          ".csv", 
-                          sep = "")
-
-## Export reviews data
-readr::write_csv(x = reviews_lalibela, path = file.path(filename_reviews))
+```{r, eval=TRUE, message=F}
+## Get reviews about Mount Kenya, Kenya
+reviews_mountKenya <- get_allReviews(nbr_page = 2, 
+                                     site_gCode = "319715", site_dCode = "1936998", 
+                                     site_name = "Mount_Kenya", 
+                                     site_geoLocation = "Mount_Kenya_National_Park"
+                                     )
 ```
 
-</div> <!-- end export-rawdata -->
+<p>
+As shown in the last column of Table 3, it's interesting to see that tourists come to Mount Kenya from all over the world, ranging from Cairo, Egypt to Copenhagen, Denmark and to Ghent, Belgium. A total of 352 reviews has been posted on <a target="_blank" href="https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html">TripAdvisor - Mount Kenya</a>.
+</p>
 
-
-
-
-
-
-```{r, eval=FALSE}
-test
+<div class="myCaption">
+*Table 3. Tourist reviews about Mount Kenya, Kenya.*
+</div>
+```{r, eval=TRUE, message=F, echo=FALSE}
+knitr::kable(psych::headTail(reviews_mountKenya[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F) %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
+                                                  full_width = T, position = "left"))
 ```
+
+</div>  <!-- end main-application-area -->
+
+<!-- <h4>5. Conclusion</h4> -->
+## Conclusion
+<p>
+I hope you find this article useful. I also believe that with a minor modification the same source code can be used to scrap reviews about other services such as restaurant, hotel, etc. 
+
+Good luck and Happy to hear your opinion. Thanks! 
+</p>
+
+
