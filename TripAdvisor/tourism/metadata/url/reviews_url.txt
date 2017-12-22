@@ -1,0 +1,47 @@
+Lalibela, Ethiopia
+
+1 = https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html
+2 = https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-or10-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html
+3 = https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-or20-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html
+...
+6 = https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-or50-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html
+...
+97=https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-or960-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html
+
+==========
+
+Axum, Ethiopia
+
+1 = https://www.tripadvisor.com/Attraction_Review-g3667784-d324991-Reviews-The_Ruins_of_Aksum-Axum_Tigray_Region.html
+2 = https://www.tripadvisor.com/Attraction_Review-g3667784-d324991-Reviews-or10-The_Ruins_of_Aksum-Axum_Tigray_Region.html
+3 = https://www.tripadvisor.com/Attraction_Review-g3667784-d324991-Reviews-or20-The_Ruins_of_Aksum-Axum_Tigray_Region.html
+...
+12= https://www.tripadvisor.com/Attraction_Review-g3667784-d324991-Reviews-or110-The_Ruins_of_Aksum-Axum_Tigray_Region.html
+
+==========
+
+Mount Kenya National park, Kenya
+
+1 = https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-Mount_Kenya-Mount_Kenya_National_Park.html
+2 = https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-or10-Mount_Kenya-Mount_Kenya_National_Park.html
+3 = https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-or20-Mount_Kenya-Mount_Kenya_National_Park.html
+...
+33=https://www.tripadvisor.com/Attraction_Review-g319715-d1936998-Reviews-or320-Mount_Kenya-Mount_Kenya_National_Park.html
+
+
+============
+
+Louvre Museum, Paris, France
+
+1  = https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-Louvre_Museum-Paris_Ile_de_France.html
+2  = https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-or10-Louvre_Museum-Paris_Ile_de_France.html
+...
+3807=https://www.tripadvisor.com/Attraction_Review-g187147-d188757-Reviews-or38060-Louvre_Museum-Paris_Ile_de_France.html
+
+
+==============
+Input parameters:
+- site_gCode: 480193
+- site_dCode: 324957
+- site_name:  Rock_Hewn_Churches_of_Lalibela
+- site_geoLocation: Lalibela_Amhara_Region

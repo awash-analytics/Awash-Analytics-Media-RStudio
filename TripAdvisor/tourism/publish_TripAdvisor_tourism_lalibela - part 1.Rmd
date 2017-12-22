@@ -1,0 +1,223 @@
+---
+title: 'Mining Lalibela: Part 1'
+author: "Awash Analytics"
+date: "21 Dec 2017"
+output: html_document
+---
+
+<style type="text/css">
+
+h1.title {
+  font-size: 38px;
+  color: DarkRed;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+div.screenshot {
+  width: 950px;
+  height: 350px;
+  margin-top: 30px;
+  margin-bottom: 125px;
+}
+
+p {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+div.img {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+</style>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<div id="intro">
+<h4>Introduction</h4>
+<p>
+In this blog post, I would like to show you how I scrapped TripAdvisor user reviews for one of tourist destination place in Ethiopia called Lalibela. This is the link for the reviews:
+<https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html>
+</p>
+</div> <!-- end introduction -->
+
+<div id="mainRCode-area">
+
+<h4> The Main R Source Code</h4>
+
+```{r, eval=FALSE}
+## Install and load library
+library(xml2)         ## for read_html function
+library(rvest)        ## for all other functions important for Web Scrapping, please see documentation
+library(stringr)      ## for regex
+library(readr)        ## for import/export of data
+library(dplyr)        ## for data manipulation
+```
+
+```{r, eval=FALSE}
+#######################################################
+## Get all reviews about Lalibela from TripAdvisor.  ##
+#######################################################
+## Main TripAdvisor URL
+TripAdvisor_url <- "https://www.tripadvisor.com"
+
+## Load source codes used for extracting reviews
+source("./functions/get_10Reviews.R")
+source("./functions/get_allReviews.R")
+
+## Read reviews
+## -- As of today (21 Dec 2017), there are a total of 97 pages of reviews found in TripAdvisor for Lalibela
+reviews <- get_allReviews(num_pages = 97)
+```
+
+</div> <!-- mainRCode-area -->
+
+<div id="get_10Reviews-area">
+<h4>Reading the Ten (10) Reviews</h4>
+
+
+```{r, eval=FALSE}
+get_10Reviews <- function(node) {
+  #################################################################################################################################
+  ## Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).                      
+  ## ** Source: https://github.com/hadley/rvest/issues/12
+  ## **         https://stackoverflow.com/questions/33250826/scraping-with-rvest-complete-with-nas-when-tag-is-not-present
+  ##################################################################################################################################
+  
+  ## Get current node/row
+  node_current <- node
+  
+  ##########################
+  ## Extract all columns  ##
+  ##########################
+  ## review title
+  tmp_title <- node_current %>%
+    rvest::html_node(".noQuotes") %>%
+    rvest::html_text() 
+  
+  ## review title
+  tmp_fullReview <- node_current %>%
+    rvest::html_node(".partial_entry") %>%
+    rvest::html_text() 
+  
+  ## review date
+  tmp_date <- node_current %>%
+    rvest::html_node(".relativeDate") %>%
+    rvest::html_text() %>%
+    stringr::str_replace(pattern = "(Reviewed)", replacement = "") %>%   ## removes the text "reviews"
+    stringr::str_trim() 
+  
+  ## reviewer username
+  tmp_userName <- node_current %>%
+    rvest::html_node(".scrname") %>%
+    rvest::html_text()
+  
+  ## reviewer location
+  tmp_userLocation <- node_current %>%
+    rvest::html_node(css = ".userLocation") %>%
+    html_text()
+  
+  ## reviewer country of origin, probably a city
+  tmp_device <- node_current %>%
+    rvest::html_node(".viaMobile") %>%
+    rvest::html_text()
+  
+  ##############################################################
+  ## Create final dataframe.                                  ##
+  ##############################################################
+  ## ** A null value is filled whenever no value is returned  ##
+  ##    from Web Scrapping step.                              ##
+  ##############################################################
+  data.frame(
+    title = ifelse(length(tmp_title) == 0, NA,       ## the IFELSE function is used to fill NA whenever HTML_NODES is not able to return a value
+                   tmp_title),
+    full_review = ifelse(length(tmp_fullReview) == 0, NA,
+                         tmp_fullReview),
+    date = ifelse(length(tmp_date) == 0, NA,
+                  tmp_date),
+    userName = ifelse(length(tmp_userName) == 0, NA,
+                      tmp_userName),
+    device = ifelse(length(tmp_device) == 0, NA,
+                    tmp_device),
+    userLocation = ifelse(length(tmp_userLocation) == 0, NA,      
+                                 tmp_userLocation),
+    stringsAsFactors=F
+  )
+}
+```
+</div> <!-- get_10Reviews-area -->
+
+<div id="get_allReviews-area">
+<h4>Looping through all pages</h4>
+
+```{r, eval=FALSE}
+get_allReviews <- function(num_pages) {
+  
+  message("Page extraction is started: ", date())
+  
+  ## loop through reviews page
+  for (i in 1:num_pages) {
+    
+    ## Get appropriate link for reviews
+    if (i == 1) {
+      lalibela_reviewHomePg <- "/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region"
+      TripAdvisor_lalibela_review <- paste(TripAdvisor_url, lalibela_reviewHomePg, ".html", 
+                                           sep = "") 
+    } 
+    else {
+      lalibela_reviewOtherPg <- paste("/Attraction_Review-g480193-d324957-Reviews-or", i-1, "0-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region",
+                                      sep = "")
+      TripAdvisor_lalibela_review <- paste(TripAdvisor_url, lalibela_reviewOtherPg, ".html",
+                                           sep = "")
+    }
+    
+    ## Read reviews about Lalibela from TripAdvisor website 
+    TripAdvisor_topic <- xml2::read_html(TripAdvisor_lalibela_review)
+    
+    ## Get main container which contains touris reviews
+    reviewer_container <- TripAdvisor_topic %>%
+      html_nodes("div.review-container")
+    
+    ## Get all required columns using the EXTRACTOR function
+    reviews_data <- lapply(X = reviewer_container, get_10Reviews) %>%
+      dplyr::bind_rows()
+    
+    if (i == 1) {
+      reviews_dataAll = data.frame(page_nbr = i, reviews_data)
+    } else {
+      reviews_dataAll <- rbind(reviews_dataAll, 
+                               data.frame(page_nbr = i, reviews_data))
+    }
+  }
+  
+  message("Page extraction is completed: ", date())
+  
+  return(reviews_dataAll)
+}
+```
+
+
+</div> <!-- get_allReviews-area -->
+
+
+
+```{r, eval=FALSE}
+test
+```

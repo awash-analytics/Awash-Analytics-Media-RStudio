@@ -1,3 +1,15 @@
+#' 
+#' Extracts all components of a review such as review title, date, location, device, etc.
+#' 
+#' @param node the single review given by a user
+#' 
+#' @author Awash Analytics (December 2017)
+#' 
+#' @seealso The main program get_allReviews.R make use of this program to extract all the components of a given review.
+#' 
+#' 
+
+
 get_10Reviews <- function(node) {
   #################################################################################################################################
   ## Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).                      
@@ -56,11 +68,11 @@ get_10Reviews <- function(node) {
                          tmp_fullReview),
     date = ifelse(length(tmp_date) == 0, NA,
                   tmp_date),
-    userName = ifelse(length(tmp_userName) == 0, NA,
+    user_name = ifelse(length(tmp_userName) == 0, NA,
                       tmp_userName),
-    device = ifelse(length(tmp_device) == 0, NA,
+    user_device = ifelse(length(tmp_device) == 0, NA,
                     tmp_device),
-    userLocation = ifelse(length(tmp_userLocation) == 0, NA,      
+    user_location = ifelse(length(tmp_userLocation) == 0, NA,      
                                  tmp_userLocation),
     stringsAsFactors=F
   )
