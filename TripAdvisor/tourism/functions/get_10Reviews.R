@@ -3,20 +3,19 @@
 #' 
 #' @param node the single review given by a user
 #' 
+#' @references 
+#' Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).
+#' https://github.com/hadley/rvest/issues/12
+#' https://stackoverflow.com/questions/33250826/scraping-with-rvest-complete-with-nas-when-tag-is-not-present
+#' 
 #' @author Awash Analytics (December 2017)
 #' 
 #' @seealso The main program get_allReviews.R make use of this program to extract all the components of a given review.
 #' 
 #' 
 
-
 get_10Reviews <- function(node) {
-  #################################################################################################################################
-  ## Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).                      
-  ## ** Source: https://github.com/hadley/rvest/issues/12
-  ## **         https://stackoverflow.com/questions/33250826/scraping-with-rvest-complete-with-nas-when-tag-is-not-present
-  ##################################################################################################################################
-  
+
   ## Get current node/row
   node_current <- node
   

@@ -1,6 +1,6 @@
 #' 
 #' Extracts reviews of an attraction site posted by tourists on TripAdvisor website.
-#' It takes care of single and multiple pages.
+#' It takes care of both a single page and multiple pages.
 #' 
 #' @param nbr_page the number of pages to grab.
 #' @param site_gCode the "g" code as defined by TripAdvisor pagination. Please see the example below.
@@ -31,7 +31,7 @@ get_allReviews <- function(nbr_page = NULL,
   
   ## loop through reviews page
   for (i in 1:nbr_page) {
-    print(paste("i = ", i, sep = " "))
+    # print(paste("i = ", i, sep = " "))       ## used only for debugging purpose
     
     ## Construct url address associated to the reviews page
     url_extCommon <- paste("/Attraction_Review-g", site_gCode, "-d", site_dCode, "-Reviews-", 

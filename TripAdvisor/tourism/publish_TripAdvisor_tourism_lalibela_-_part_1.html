@@ -174,24 +174,1139 @@ In this blog post, I would like to show you how I scrapped TripAdvisor user revi
 <p><!-- end introduction --></p>
 <div id="mainRCode-area">
 <h4>
-The Main R Source Code
+Web Scrapping: Reading reviews about Attraction site from TripAdvisor
 </h4>
-<pre class="r"><code>test</code></pre>
-<pre class="r"><code>test</code></pre>
+<pre class="r"><code>################################
+## Environmental settings.    ##
+################################
+## Set the working directory
+# setwd(&quot;./TripAdvisor/tourism/&quot;)
+
+## Install and load library
+library(xml2)         ## to use the READ_HTML function
+library(rvest)        ## for all other utilities used for Web Scrapping. Please see package documentation
+library(stringr)      ## for regular expression (regex)
+library(readr)        ## for import/export of data
+library(dplyr)        ## for data manipulation
+library(magrittr)     ## for the pipe operator
+
+# options(knitr.table.format = &quot;markdown&quot;)
+options(knitr.table.format = &quot;html&quot;)
+
+###################################################
+## Reading reviews of an attraction site.       ##
+###################################################
+## Load custom source codes
+source(&quot;./functions/get_10Reviews.R&quot;)
+source(&quot;./functions/get_allReviews_v2.R&quot;)
+
+## Get reviews about Lalibela, Ethiopia
+reviews_lalibela &lt;- get_allReviews(nbr_page = 2, 
+                                   site_gCode = &quot;480193&quot;, site_dCode = &quot;324957&quot;, 
+                                   site_name = &quot;Rock_Hewn_Churches_of_Lalibela&quot;, 
+                                   site_geoLocation = &quot;Lalibela_Amhara_Region&quot;
+                                   )</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 1. TripAdvisor reviews about Lalibela, Ethiopia .
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+attraction_location
+</th>
+<th style="text-align:right;">
+total_reviews
+</th>
+<th style="text-align:right;">
+page_nbr
+</th>
+<th style="text-align:left;">
+title
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+user_device
+</th>
+<th style="text-align:left;">
+user_location
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Great witness to ancient history
+</td>
+<td style="text-align:left;">
+4 days ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+Colorado
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+The monstrous protective roofs have completely destroyed the athmosphere
+</td>
+<td style="text-align:left;">
+1 week ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+London, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Stunning and atmospheric
+</td>
+<td style="text-align:left;">
+1 week ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Sheffield, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Marvelous
+</td>
+<td style="text-align:left;">
+2 weeks ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+8th wonder of the world
+</td>
+<td style="text-align:left;">
+October 31, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Edinburgh, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Superb, amazing
+</td>
+<td style="text-align:left;">
+October 28, 2017
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+London, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+A hidden gem
+</td>
+<td style="text-align:left;">
+October 23, 2017
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+Fredrikstad, Norway
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Lalibela 1000, Ethiopia
+</td>
+<td style="text-align:right;">
+1434
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+unreal
+</td>
+<td style="text-align:left;">
+October 22, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Greater London, United Kingdom
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## Get reviews about Axum, Ethiopia
+reviews_axum &lt;- get_allReviews(nbr_page = 2, 
+                               site_gCode = &quot;3667784&quot;, site_dCode = &quot;324991&quot;, 
+                               site_name = &quot;The_Ruins_of_Aksum&quot;, 
+                               site_geoLocation = &quot;Axum_Tigray_Region&quot;
+                               )</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 2. TripAdvisor reviews about Axum, Ethiopia .
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+attraction_location
+</th>
+<th style="text-align:right;">
+total_reviews
+</th>
+<th style="text-align:right;">
+page_nbr
+</th>
+<th style="text-align:left;">
+title
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+user_device
+</th>
+<th style="text-align:left;">
+user_location
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Axum - Top drawer Guide
+</td>
+<td style="text-align:left;">
+3 weeks ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Coquitlam, BC
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+History
+</td>
+<td style="text-align:left;">
+4 weeks ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+History
+</td>
+<td style="text-align:left;">
+November 3, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Must See!
+</td>
+<td style="text-align:left;">
+October 12, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Bage, RS
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+fascinating
+</td>
+<td style="text-align:left;">
+February 21, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Modiin, Israel
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Interesting, filled with history.
+</td>
+<td style="text-align:left;">
+February 19, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Elmhurst, Illinois
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+very intersting historical archeologicl site
+</td>
+<td style="text-align:left;">
+January 3, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Herzliya, Israel
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Axum, Ethiopia
+</td>
+<td style="text-align:right;">
+204
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Worth seeing, particularly the museum
+</td>
+<td style="text-align:left;">
+January 3, 2017
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## Get reviews about Mount Kenya, Kenya
+reviews_mountKenya &lt;- get_allReviews(nbr_page = 2, 
+                                     site_gCode = &quot;319715&quot;, site_dCode = &quot;1936998&quot;, 
+                                     site_name = &quot;Mount_Kenya&quot;, 
+                                     site_geoLocation = &quot;Mount_Kenya_National_Park&quot;
+                                     )</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 3. TripAdvisor reviews about Mount Kenya, Kenya .
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+attraction_location
+</th>
+<th style="text-align:right;">
+total_reviews
+</th>
+<th style="text-align:right;">
+page_nbr
+</th>
+<th style="text-align:left;">
+title
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+user_device
+</th>
+<th style="text-align:left;">
+user_location
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+‘Summit dash’ to Point Lenana, Mount Kenya
+</td>
+<td style="text-align:left;">
+1 week ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Copenhagen, Denmark
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+An easy mountain with a great view
+</td>
+<td style="text-align:left;">
+1 week ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+Cairo, Egypt
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Burguret - Chogoria with Equitorial Star
+</td>
+<td style="text-align:left;">
+1 week ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+London, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Mount Kenya hike (Chogoria route) with Go To Mount Kenya
+</td>
+<td style="text-align:left;">
+2 weeks ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Cape Town, Western Cape, South Africa
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+6 day trek on Mount Kenya
+</td>
+<td style="text-align:left;">
+October 27, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+London, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Polemark Tours - Wonderful trip up Mt kenya
+</td>
+<td style="text-align:left;">
+October 24, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Ghent, Belgium
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Point Lenana with GotoMountKenya
+</td>
+<td style="text-align:left;">
+October 19, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+High Wycombe, United Kingdom
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Mount Kenya National Park 10400, Kenya
+</td>
+<td style="text-align:right;">
+352
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+we are mt.kenya trekking veterans
+</td>
+<td style="text-align:left;">
+October 18, 2017
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+kenya
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>## Get reviews about Louvre Museum, Paris, France
+reviews_louvreMuseum &lt;- get_allReviews(nbr_page = 2, 
+                                       site_gCode = &quot;187147&quot;, site_dCode = &quot;188757&quot;, 
+                                       site_name = &quot;Louvre_Museum&quot;, 
+                                       site_geoLocation = &quot;Paris_Ile_de_France&quot;
+                                       )</code></pre>
+<table class="table table-striped table-hover table-condensed table-responsive" style="margin-left: auto; margin-right: auto;">
+<caption>
+Table 4. TripAdvisor reviews about Louvre museum, France .
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+attraction_location
+</th>
+<th style="text-align:right;">
+total_reviews
+</th>
+<th style="text-align:right;">
+page_nbr
+</th>
+<th style="text-align:left;">
+title
+</th>
+<th style="text-align:left;">
+date
+</th>
+<th style="text-align:left;">
+user_device
+</th>
+<th style="text-align:left;">
+user_location
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Love the Louvre
+</td>
+<td style="text-align:left;">
+yesterday
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Love love love!!!
+</td>
+<td style="text-align:left;">
+yesterday
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+Bring your own!
+</td>
+<td style="text-align:left;">
+yesterday
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+Melbourne, Australia
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:left;">
+We love the Louvre
+</td>
+<td style="text-align:left;">
+yesterday
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+Montpelier, Vermont
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+theSouthAfricanreview
+</td>
+<td style="text-align:left;">
+3 days ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+Libreville, Gabon
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Huge place
+</td>
+<td style="text-align:left;">
+3 days ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+New York City, New York
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Amazing museum
+</td>
+<td style="text-align:left;">
+3 days ago
+</td>
+<td style="text-align:left;">
+via mobile
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+99 rue de Rivoli, 75001 Paris, France
+</td>
+<td style="text-align:right;">
+80769
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+Bigger than you can even imagine!
+</td>
+<td style="text-align:left;">
+3 days ago
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+New York City, New York
+</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>#######################################################
+## Export final reviews data as a CSV file format.   ##
+#######################################################
+## Define filename
+site_name &lt;- &quot;lalibela&quot;
+filename_reviews &lt;- paste(&quot;./output/rawdata/reviews_TripAdvisor-&quot;, site_name, &quot;_&quot;,
+                          format(Sys.Date(), format=&quot;%B_%d_%Y&quot;), 
+                          &quot;.csv&quot;, 
+                          sep = &quot;&quot;)
+
+## Export reviews data
+readr::write_csv(x = reviews_lalibela, path = file.path(filename_reviews))</code></pre>
 </div>
 <p><!-- mainRCode-area --></p>
 <div id="get_10Reviews-area">
 <h4>
-Reading the Ten (10) Reviews
+The mini R program: Reading the Ten (10) Reviews
 </h4>
-<pre class="r"><code>test</code></pre>
+<pre class="r"><code>#' 
+#' Extracts all components of a review such as review title, date, location, device, etc.
+#' 
+#' @param node the single review given by a user
+#' 
+#' @references 
+#' Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).
+#' https://github.com/hadley/rvest/issues/12
+#' https://stackoverflow.com/questions/33250826/scraping-with-rvest-complete-with-nas-when-tag-is-not-present
+#' 
+#' @author Awash Analytics (December 2017)
+#' 
+#' @seealso The main program get_allReviews.R make use of this program to extract all the components of a given review.
+#' 
+#' 
+
+get_10Reviews &lt;- function(node) {
+
+  ## Get current node/row
+  node_current &lt;- node
+  
+  ##########################
+  ## Extract all columns  ##
+  ##########################
+  ## review title
+  tmp_title &lt;- node_current %&gt;%
+    rvest::html_node(&quot;.noQuotes&quot;) %&gt;%
+    rvest::html_text() 
+  
+  ## review title
+  tmp_fullReview &lt;- node_current %&gt;%
+    rvest::html_node(&quot;.partial_entry&quot;) %&gt;%
+    rvest::html_text() 
+  
+  ## review date
+  tmp_date &lt;- node_current %&gt;%
+    rvest::html_node(&quot;.relativeDate&quot;) %&gt;%
+    rvest::html_text() %&gt;%
+    stringr::str_replace(pattern = &quot;(Reviewed)&quot;, replacement = &quot;&quot;) %&gt;%   ## removes the text &quot;reviews&quot;
+    stringr::str_trim() 
+  
+  ## reviewer username
+  tmp_userName &lt;- node_current %&gt;%
+    rvest::html_node(&quot;.scrname&quot;) %&gt;%
+    rvest::html_text()
+  
+  ## reviewer location
+  tmp_userLocation &lt;- node_current %&gt;%
+    rvest::html_node(css = &quot;.userLocation&quot;) %&gt;%
+    html_text()
+  
+  ## reviewer country of origin, probably a city
+  tmp_device &lt;- node_current %&gt;%
+    rvest::html_node(&quot;.viaMobile&quot;) %&gt;%
+    rvest::html_text()
+  
+  ##############################################################
+  ## Create final dataframe.                                  ##
+  ##############################################################
+  ## ** A null value is filled whenever no value is returned  ##
+  ##    from Web Scrapping step.                              ##
+  ##############################################################
+  data.frame(
+    title = ifelse(length(tmp_title) == 0, NA,       ## the IFELSE function is used to fill NA whenever HTML_NODES is not able to return a value
+                   tmp_title),
+    full_review = ifelse(length(tmp_fullReview) == 0, NA,
+                         tmp_fullReview),
+    date = ifelse(length(tmp_date) == 0, NA,
+                  tmp_date),
+    user_name = ifelse(length(tmp_userName) == 0, NA,
+                      tmp_userName),
+    user_device = ifelse(length(tmp_device) == 0, NA,
+                    tmp_device),
+    user_location = ifelse(length(tmp_userLocation) == 0, NA,      
+                                 tmp_userLocation),
+    stringsAsFactors=F
+  )
+}</code></pre>
 </div>
 <p><!-- get_10Reviews-area --></p>
 <div id="get_allReviews-area">
 <h4>
-Looping through all pages
+The magic of patterns: Reading all pages
 </h4>
-<pre class="r"><code>test</code></pre>
+<pre class="r"><code>#' 
+#' Extracts reviews of an attraction site posted by tourists on TripAdvisor website.
+#' It takes care of both a single page and multiple pages.
+#' 
+#' @param nbr_page the number of pages to grab.
+#' @param site_gCode the &quot;g&quot; code as defined by TripAdvisor pagination. Please see the example below.
+#' @param site_dCode the &quot;d&quot; code as defined by TripAdvisor pagination. Please see the example below.
+#' @param site_name the name of an attraction site.
+#' @param site_geoLocation the geographical location of an attraction site. Not that this is not related to a latitude/longitude values. Please see the example below.
+#' 
+#' @describe This source code calls get_10Reviews.R program to extract the required components (e.g., review title, date, device). Depending on
+#' a user request, it can also loop through multiple pages. Finally, it adds extra columns (e.g., attraction location, number of reviews, etc) 
+#' to existing reviews stored in a dataframe.
+#' 
+#' @author Awash Analytics (December 2017)
+#' 
+#' @example reviews_lalibela &lt;- get_allReviews(nbr_page = 2, 
+#'                                             site_gCode = &quot;480193&quot;, site_dCode = &quot;324957&quot;, 
+#'                                             site_name = &quot;Rock_Hewn_Churches_of_Lalibela&quot;, site_geoLocation = &quot;Lalibela_Amhara_Region&quot;
+#'                                             )
+#' 
+
+get_allReviews &lt;- function(nbr_page = NULL, 
+                           site_gCode = NULL, site_dCode = NULL, 
+                           site_name = NULL, site_geoLocation = NULL) {
+  
+  message(&quot;Page extraction is started: &quot;, date())
+  
+  ## Main TripAdvisor URL
+  TripAdvisor_url &lt;- &quot;https://www.tripadvisor.com&quot;
+  
+  ## loop through reviews page
+  for (i in 1:nbr_page) {
+    # print(paste(&quot;i = &quot;, i, sep = &quot; &quot;))       ## used only for debugging purpose
+    
+    ## Construct url address associated to the reviews page
+    url_extCommon &lt;- paste(&quot;/Attraction_Review-g&quot;, site_gCode, &quot;-d&quot;, site_dCode, &quot;-Reviews-&quot;, 
+                           sep = &quot;&quot;) 
+    
+    if (i == 1) {
+      # reviewHomePg &lt;- &quot;/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region&quot;
+      reviewHomePg &lt;- paste(url_extCommon,
+                            site_name, &quot;-&quot;, site_geoLocation, 
+                            sep = &quot;&quot;)
+      
+      TripAdvisor_reviewUrl &lt;- paste(TripAdvisor_url, reviewHomePg, &quot;.html&quot;, 
+                                           sep = &quot;&quot;) 
+      
+      ## Backup review home address for later use
+      TripAdvisor_reviewHomeUrl &lt;- TripAdvisor_reviewUrl
+    } 
+    else {
+      # reviewOtherPg &lt;- paste(&quot;/Attraction_Review-g480193-d324957-Reviews-or&quot;, i-1, &quot;0-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region&quot;,
+      #                                 sep = &quot;&quot;)
+      reviewOtherPg &lt;- paste(url_extCommon, 
+                             &quot;or&quot;, i-1, &quot;0-&quot;, 
+                             site_name, &quot;-&quot;, site_geoLocation, 
+                             sep = &quot;&quot;)
+      
+      TripAdvisor_reviewUrl &lt;- paste(TripAdvisor_url, reviewOtherPg, &quot;.html&quot;,
+                                           sep = &quot;&quot;)
+    }
+    
+    ## Read reviews given about an attraction site 
+    TripAdvisor_topic &lt;- xml2::read_html(TripAdvisor_reviewUrl)
+    
+    ## Get main container which contains a single review
+    reviewer_container &lt;- TripAdvisor_topic %&gt;%
+      html_nodes(&quot;div.review-container&quot;)
+    
+    ## Get all components of reviews (e.g., title, location, device, etc) and loop through the ten (10) reviews
+    reviews_data &lt;- lapply(X = reviewer_container, get_10Reviews) %&gt;%
+      dplyr::bind_rows()
+    
+    ## Concatenate reviews obtained from all pages
+    if (i == 1) {
+      reviews_dataAll = data.frame(page_nbr = i, reviews_data)
+    } else {
+      reviews_dataAll &lt;- rbind(reviews_dataAll, 
+                               data.frame(page_nbr = i, reviews_data))
+    }
+  }
+  
+  #############################################################################################################################
+  ## Combine reviews data with other variables available in review homepage (e.g., number of reviews, site location, etc).   ##
+  #############################################################################################################################
+  # TripAdvisor_homePage &lt;- &quot;https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html&quot;
+  TripAdvisor_reviewHome &lt;- xml2::read_html(TripAdvisor_reviewHomeUrl)
+  
+  ## Get total number of reviews given for an attraction site
+  total_reviews &lt;- TripAdvisor_reviewHome %&gt;%
+    rvest::html_nodes(&quot;.seeAllReviews&quot;) %&gt;%
+    rvest::html_text() %&gt;%
+    stringr::str_replace_all(pattern = &quot;(reviews)|(\\\nRead\\s+(all))&quot;, replacement = &quot;&quot;) %&gt;%   ## removes the text &quot;reviews&quot;
+    stringr::str_trim() %&gt;%
+    stringr::str_replace(pattern = &quot;,&quot;, replacement = &quot;&quot;) %&gt;%           ## removes the comma
+    as.numeric() %&gt;%
+    dplyr::first()          ## In case, multiple values are returned (e.g., &quot;204&quot;, &quot;204&quot; which is true for Axum, Ethiopia)
+  
+  ## get attraction site location
+  attraction_location &lt;- TripAdvisor_reviewHome %&gt;%
+    rvest::html_node(&quot;.address&quot;) %&gt;%
+    rvest::html_text() 
+  
+  ## Date for data access
+  date_dataAccess &lt;- Sys.Date() %&gt;%
+    format(format = &quot;%B %d, %Y&quot;)          ## this gives date format like &quot;December 21, 2017&quot;
+  
+  ## Combine main reviews data and additional info about the site
+  reviews_final &lt;- data.frame(attraction_location, total_reviews, 
+                              date_dataAccess, reviews_dataAll 
+  )
+  
+  message(&quot;Page extraction is completed: &quot;, date())
+  
+  return(reviews_final)
+}</code></pre>
 </div>
 <p><!-- get_allReviews-area --></p>
 <pre class="r"><code>test</code></pre>

@@ -60,32 +60,326 @@ In this blog post, I would like to show you how I scrapped TripAdvisor user revi
 
 <div id="mainRCode-area">
 
-<h4> The Main R Source Code</h4>
+<h4>Web Scrapping: Reading reviews about Attraction site from TripAdvisor</h4>
 
-```{r, eval=FALSE}
-test
+```{r, eval=TRUE, message=F, warning=F}
+################################
+## Environmental settings.    ##
+################################
+## Set the working directory
+# setwd("./TripAdvisor/tourism/")
+
+## Install and load library
+library(xml2)         ## to use the READ_HTML function
+library(rvest)        ## for all other utilities used for Web Scrapping. Please see package documentation
+library(stringr)      ## for regular expression (regex)
+library(readr)        ## for import/export of data
+library(dplyr)        ## for data manipulation
+library(magrittr)     ## for the pipe operator
+
+# options(knitr.table.format = "markdown")
+options(knitr.table.format = "html")
+
+###################################################
+## Reading reviews of an attraction site.       ##
+###################################################
+## Load custom source codes
+source("./functions/get_10Reviews.R")
+source("./functions/get_allReviews_v2.R")
+
+## Get reviews about Lalibela, Ethiopia
+reviews_lalibela <- get_allReviews(nbr_page = 2, 
+                                   site_gCode = "480193", site_dCode = "324957", 
+                                   site_name = "Rock_Hewn_Churches_of_Lalibela", 
+                                   site_geoLocation = "Lalibela_Amhara_Region"
+                                   )
 ```
 
+```{r, eval=TRUE, message=F, echo=FALSE}
+knitr::kable(psych::headTail(reviews_lalibela[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F,
+             caption = "Table 1. TripAdvisor reviews about Lalibela, Ethiopia .") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
+                                                  full_width = T, position = "left"))
+```
+
+
+```{r, eval=TRUE, message=F}
+## Get reviews about Axum, Ethiopia
+reviews_axum <- get_allReviews(nbr_page = 2, 
+                               site_gCode = "3667784", site_dCode = "324991", 
+                               site_name = "The_Ruins_of_Aksum", 
+                               site_geoLocation = "Axum_Tigray_Region"
+                               )
+```
+
+```{r, eval=TRUE, message=F, echo=FALSE}
+knitr::kable(psych::headTail(reviews_axum[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F,
+             caption = "Table 2. TripAdvisor reviews about Axum, Ethiopia .") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
+                                                  full_width = T, position = "left"))
+```
+
+```{r, eval=TRUE, message=F}
+## Get reviews about Mount Kenya, Kenya
+reviews_mountKenya <- get_allReviews(nbr_page = 2, 
+                                     site_gCode = "319715", site_dCode = "1936998", 
+                                     site_name = "Mount_Kenya", 
+                                     site_geoLocation = "Mount_Kenya_National_Park"
+                                     )
+```
+
+
+```{r, eval=TRUE, message=F, echo=FALSE}
+knitr::kable(psych::headTail(reviews_mountKenya[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F,
+             caption = "Table 3. TripAdvisor reviews about Mount Kenya, Kenya .") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
+                                                  full_width = T, position = "left"))
+```
+
+
+```{r, eval=TRUE, message=F}
+## Get reviews about Louvre Museum, Paris, France
+reviews_louvreMuseum <- get_allReviews(nbr_page = 2, 
+                                       site_gCode = "187147", site_dCode = "188757", 
+                                       site_name = "Louvre_Museum", 
+                                       site_geoLocation = "Paris_Ile_de_France"
+                                       )
+```
+
+
+```{r, eval=TRUE, message=F, echo=FALSE}
+knitr::kable(psych::headTail(reviews_louvreMuseum[, c("attraction_location",  "total_reviews", "page_nbr", "title", "date", "user_device", "user_location")], ellipsis = F), row.names = F,
+             caption = "Table 4. TripAdvisor reviews about Louvre museum, France .") %>%
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive",
+                                                  full_width = T, position = "left"))
+```
+
+
 ```{r, eval=FALSE}
-test
+#######################################################
+## Export final reviews data as a CSV file format.   ##
+#######################################################
+## Define filename
+site_name <- "lalibela"
+filename_reviews <- paste("./output/rawdata/reviews_TripAdvisor-", site_name, "_",
+                          format(Sys.Date(), format="%B_%d_%Y"), 
+                          ".csv", 
+                          sep = "")
+
+## Export reviews data
+readr::write_csv(x = reviews_lalibela, path = file.path(filename_reviews))
 ```
 
 </div> <!-- mainRCode-area -->
 
 <div id="get_10Reviews-area">
-<h4>Reading the Ten (10) Reviews</h4>
+<h4>The mini R program: Reading the Ten (10) Reviews</h4>
 
 
 ```{r, eval=FALSE}
-test
+#' 
+#' Extracts all components of a review such as review title, date, location, device, etc.
+#' 
+#' @param node the single review given by a user
+#' 
+#' @references 
+#' Inspired by Hadley Wickham (author of pkg::rvest) and BjaRule (StackOverflow).
+#' https://github.com/hadley/rvest/issues/12
+#' https://stackoverflow.com/questions/33250826/scraping-with-rvest-complete-with-nas-when-tag-is-not-present
+#' 
+#' @author Awash Analytics (December 2017)
+#' 
+#' @seealso The main program get_allReviews.R make use of this program to extract all the components of a given review.
+#' 
+#' 
+
+get_10Reviews <- function(node) {
+
+  ## Get current node/row
+  node_current <- node
+  
+  ##########################
+  ## Extract all columns  ##
+  ##########################
+  ## review title
+  tmp_title <- node_current %>%
+    rvest::html_node(".noQuotes") %>%
+    rvest::html_text() 
+  
+  ## review title
+  tmp_fullReview <- node_current %>%
+    rvest::html_node(".partial_entry") %>%
+    rvest::html_text() 
+  
+  ## review date
+  tmp_date <- node_current %>%
+    rvest::html_node(".relativeDate") %>%
+    rvest::html_text() %>%
+    stringr::str_replace(pattern = "(Reviewed)", replacement = "") %>%   ## removes the text "reviews"
+    stringr::str_trim() 
+  
+  ## reviewer username
+  tmp_userName <- node_current %>%
+    rvest::html_node(".scrname") %>%
+    rvest::html_text()
+  
+  ## reviewer location
+  tmp_userLocation <- node_current %>%
+    rvest::html_node(css = ".userLocation") %>%
+    html_text()
+  
+  ## reviewer country of origin, probably a city
+  tmp_device <- node_current %>%
+    rvest::html_node(".viaMobile") %>%
+    rvest::html_text()
+  
+  ##############################################################
+  ## Create final dataframe.                                  ##
+  ##############################################################
+  ## ** A null value is filled whenever no value is returned  ##
+  ##    from Web Scrapping step.                              ##
+  ##############################################################
+  data.frame(
+    title = ifelse(length(tmp_title) == 0, NA,       ## the IFELSE function is used to fill NA whenever HTML_NODES is not able to return a value
+                   tmp_title),
+    full_review = ifelse(length(tmp_fullReview) == 0, NA,
+                         tmp_fullReview),
+    date = ifelse(length(tmp_date) == 0, NA,
+                  tmp_date),
+    user_name = ifelse(length(tmp_userName) == 0, NA,
+                      tmp_userName),
+    user_device = ifelse(length(tmp_device) == 0, NA,
+                    tmp_device),
+    user_location = ifelse(length(tmp_userLocation) == 0, NA,      
+                                 tmp_userLocation),
+    stringsAsFactors=F
+  )
+}
 ```
 </div> <!-- get_10Reviews-area -->
 
+
 <div id="get_allReviews-area">
-<h4>Looping through all pages</h4>
+<h4>The magic of patterns: Reading all pages</h4>
 
 ```{r, eval=FALSE}
-test
+#' 
+#' Extracts reviews of an attraction site posted by tourists on TripAdvisor website.
+#' It takes care of both a single page and multiple pages.
+#' 
+#' @param nbr_page the number of pages to grab.
+#' @param site_gCode the "g" code as defined by TripAdvisor pagination. Please see the example below.
+#' @param site_dCode the "d" code as defined by TripAdvisor pagination. Please see the example below.
+#' @param site_name the name of an attraction site.
+#' @param site_geoLocation the geographical location of an attraction site. Not that this is not related to a latitude/longitude values. Please see the example below.
+#' 
+#' @describe This source code calls get_10Reviews.R program to extract the required components (e.g., review title, date, device). Depending on
+#' a user request, it can also loop through multiple pages. Finally, it adds extra columns (e.g., attraction location, number of reviews, etc) 
+#' to existing reviews stored in a dataframe.
+#' 
+#' @author Awash Analytics (December 2017)
+#' 
+#' @example reviews_lalibela <- get_allReviews(nbr_page = 2, 
+#'                                             site_gCode = "480193", site_dCode = "324957", 
+#'                                             site_name = "Rock_Hewn_Churches_of_Lalibela", site_geoLocation = "Lalibela_Amhara_Region"
+#'                                             )
+#' 
+
+get_allReviews <- function(nbr_page = NULL, 
+                           site_gCode = NULL, site_dCode = NULL, 
+                           site_name = NULL, site_geoLocation = NULL) {
+  
+  message("Page extraction is started: ", date())
+  
+  ## Main TripAdvisor URL
+  TripAdvisor_url <- "https://www.tripadvisor.com"
+  
+  ## loop through reviews page
+  for (i in 1:nbr_page) {
+    # print(paste("i = ", i, sep = " "))       ## used only for debugging purpose
+    
+    ## Construct url address associated to the reviews page
+    url_extCommon <- paste("/Attraction_Review-g", site_gCode, "-d", site_dCode, "-Reviews-", 
+                           sep = "") 
+    
+    if (i == 1) {
+      # reviewHomePg <- "/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region"
+      reviewHomePg <- paste(url_extCommon,
+                            site_name, "-", site_geoLocation, 
+                            sep = "")
+      
+      TripAdvisor_reviewUrl <- paste(TripAdvisor_url, reviewHomePg, ".html", 
+                                           sep = "") 
+      
+      ## Backup review home address for later use
+      TripAdvisor_reviewHomeUrl <- TripAdvisor_reviewUrl
+    } 
+    else {
+      # reviewOtherPg <- paste("/Attraction_Review-g480193-d324957-Reviews-or", i-1, "0-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region",
+      #                                 sep = "")
+      reviewOtherPg <- paste(url_extCommon, 
+                             "or", i-1, "0-", 
+                             site_name, "-", site_geoLocation, 
+                             sep = "")
+      
+      TripAdvisor_reviewUrl <- paste(TripAdvisor_url, reviewOtherPg, ".html",
+                                           sep = "")
+    }
+    
+    ## Read reviews given about an attraction site 
+    TripAdvisor_topic <- xml2::read_html(TripAdvisor_reviewUrl)
+    
+    ## Get main container which contains a single review
+    reviewer_container <- TripAdvisor_topic %>%
+      html_nodes("div.review-container")
+    
+    ## Get all components of reviews (e.g., title, location, device, etc) and loop through the ten (10) reviews
+    reviews_data <- lapply(X = reviewer_container, get_10Reviews) %>%
+      dplyr::bind_rows()
+    
+    ## Concatenate reviews obtained from all pages
+    if (i == 1) {
+      reviews_dataAll = data.frame(page_nbr = i, reviews_data)
+    } else {
+      reviews_dataAll <- rbind(reviews_dataAll, 
+                               data.frame(page_nbr = i, reviews_data))
+    }
+  }
+  
+  #############################################################################################################################
+  ## Combine reviews data with other variables available in review homepage (e.g., number of reviews, site location, etc).   ##
+  #############################################################################################################################
+  # TripAdvisor_homePage <- "https://www.tripadvisor.com/Attraction_Review-g480193-d324957-Reviews-Rock_Hewn_Churches_of_Lalibela-Lalibela_Amhara_Region.html"
+  TripAdvisor_reviewHome <- xml2::read_html(TripAdvisor_reviewHomeUrl)
+  
+  ## Get total number of reviews given for an attraction site
+  total_reviews <- TripAdvisor_reviewHome %>%
+    rvest::html_nodes(".seeAllReviews") %>%
+    rvest::html_text() %>%
+    stringr::str_replace_all(pattern = "(reviews)|(\\\nRead\\s+(all))", replacement = "") %>%   ## removes the text "reviews"
+    stringr::str_trim() %>%
+    stringr::str_replace(pattern = ",", replacement = "") %>%           ## removes the comma
+    as.numeric() %>%
+    dplyr::first()          ## In case, multiple values are returned (e.g., "204", "204" which is true for Axum, Ethiopia)
+  
+  ## get attraction site location
+  attraction_location <- TripAdvisor_reviewHome %>%
+    rvest::html_node(".address") %>%
+    rvest::html_text() 
+  
+  ## Date for data access
+  date_dataAccess <- Sys.Date() %>%
+    format(format = "%B %d, %Y")          ## this gives date format like "December 21, 2017"
+  
+  ## Combine main reviews data and additional info about the site
+  reviews_final <- data.frame(attraction_location, total_reviews, 
+                              date_dataAccess, reviews_dataAll 
+  )
+  
+  message("Page extraction is completed: ", date())
+  
+  return(reviews_final)
+}
 ```
 
 

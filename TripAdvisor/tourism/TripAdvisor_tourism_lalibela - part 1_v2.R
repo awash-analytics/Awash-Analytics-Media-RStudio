@@ -1,4 +1,3 @@
-
 ################################
 ## Environmental settings.    ##
 ################################
@@ -6,16 +5,17 @@
 setwd("./TripAdvisor/tourism/")
 
 ## Install and load library
-library(xml2)         ## for read_html function
-library(rvest)        ## for all other functions important for Web Scrapping, please see documentation
-library(stringr)      ## for regex
+library(xml2)         ## to use the READ_HTML function
+library(rvest)        ## for all other utilities used for Web Scrapping. Please see package documentation
+library(stringr)      ## for regular expression (regex)
 library(readr)        ## for import/export of data
 library(dplyr)        ## for data manipulation
+library(magrittr)     ## for the pipe operator
 
 
-#######################################################
-## Reading all reviews for an attraction site.       ##
-#######################################################
+###################################################
+## Reading reviews of an attraction site.       ##
+###################################################
 ## Load custom source codes
 source("./functions/get_10Reviews.R")
 source("./functions/get_allReviews_v2.R")
@@ -45,22 +45,15 @@ reviews_louvreMuseum <- get_allReviews(nbr_page = 2,
                                        )
 
 
-#################################################
-## Export reviews data as a CSV file format.   ##
-#################################################
+#######################################################
+## Export final reviews data as a CSV file format.   ##
+#######################################################
 ## Define filename
-filename_reviews <- paste("./output/rawdata/reviews_TripAdvisor_lalibela-", 
+site_name <- "lalibela"
+filename_reviews <- paste("./output/rawdata/reviews_TripAdvisor-", site_name, "_",
                           format(Sys.Date(), format="%B_%d_%Y"), 
                           ".csv", 
                           sep = "")
 
 ## Export reviews data
-readr::write_csv(x = reviews_final, path = file.path(filename_reviews))
-
-
-
-
-
-
-
-
+readr::write_csv(x = reviews_lalibela, path = file.path(filename_reviews))
