@@ -11,7 +11,7 @@
 ## Environmental setting.     ##
 ## -------------------------- ##
 ## set time zone
-options(tz = "Europe/Amsterdam")
+options(tz = "Europe/Berlin")
 
 ## load library
 source("./functions/load_library.R")
