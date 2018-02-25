@@ -19,7 +19,8 @@ bank_analdata1 <- bank_rwdata %>%
   dplyr::select(transactiondate, amount) %>% 
   dplyr::mutate(date = lubridate::ymd(transactiondate)) %>%
   dplyr::mutate(year = lubridate::year(date)) %>% 
-  dplyr::mutate(month = lubridate::month(date)) %>% 
+  dplyr::mutate(year_f = as.factor(year)) %>% 
+  dplyr::mutate(month = lubridate::month(date, label = TRUE, abbr = TRUE)) %>% 
   dplyr::mutate(day = lubridate::day(date))  %>% 
   dplyr::mutate(wkday = lubridate::wday(date, label = TRUE, abbr = FALSE)) %>% 
   dplyr::select(-transactiondate)
@@ -32,10 +33,10 @@ bank_analdata2 <- bank_analdata1 %>%
 
 ## collapse daily amount, and remove big expenses (e.g., housing, etc)
 bank_analdata3 <- bank_analdata2 %>% 
-  dplyr::group_by(date, year, month, day) %>% 
+  dplyr::group_by(date, year_f, month, day, wkday) %>% 
   dplyr::summarise(amount_day = sum(amount)) %>% 
   dplyr::filter(!amount_day > 150) %>% 
-  dplyr::select(date, year, month, day, amount_day)
+  dplyr::select(date, year_f, month, day, wkday, amount_day)
 
 ## create final dataset
 bank_analdata <- bank_analdata3
@@ -43,11 +44,12 @@ bank_analdata <- bank_analdata3
 ####################################
 ## Exploratory data analysis.     ##
 ####################################
-ggplot2::ggplot(data = bank_analdata, aes(x = date, y = amount_day)) +
+ggplot2::ggplot(data = bank_analdata, 
+                mapping = aes(x = day, y = amount_day, group = year_f)) +
   geom_line() +
-  # scale_x_date(format = "%b-%Y") +
-  facet_wrap(~ year) +
-  xlab("Date") + ylab("Expense")
+  facet_grid(facets = year_f ~ .) +
+  xlab("Day") + ylab("Expense") +
+  theme_bw()
 
 
 
