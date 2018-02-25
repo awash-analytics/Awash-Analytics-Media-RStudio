@@ -16,20 +16,15 @@ options(tz = "Europe/Amsterdam")
 ## load library
 source("./functions/load_library.R")
 
+## Install TS packages
+# devtools::install_github("robjhyndman/forecast")
+
+## load library
+library(forecast)
+
 ## load source dataset
-day <- readr::read_csv(file = "./dataset/day.csv", col_names = TRUE)
+daily_data <- readr::read_csv(file = "./dataset/day.csv", col_names = TRUE)
 hour <- readr::read_csv(file = "./dataset/hour.csv", col_names = TRUE)
-
-## --------------------------------------------- ##
-## Understanding derivation of important days    ##
-## (e.g., weekday, holiday, season)              ##
-## --------------------------------------------- ##
-day_wkday <- day %>% 
-  dplyr::select(dteday, weekday) %>% 
-  dplyr::mutate(weekday_mine = weekdays(as.Date(dteday, "%y-%m-%d")))
-
-
-
 
 
 
