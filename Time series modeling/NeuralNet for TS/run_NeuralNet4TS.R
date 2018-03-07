@@ -4,19 +4,11 @@
 ## Date: 06-Mar-2018                    ##
 ##########################################
 
-## load supportive library
+## load library
 source("./load library.R")
 
-## load main library
-# install.packages("tscount", dependencies = TRUE)
-library(tscount)
-
-# install.packages("forecast", dependencies = TRUE)
-library(forecast)
-library(tseries)
-
-library(zoo)         # needed for deriving lag variables
-library(quantmod)    # needed for deriving lag variables
+## load lag calculator
+source("./lag_calculator.R")
 
 
 ## --------------------------------------------------- ##
@@ -29,28 +21,67 @@ data("ecoli", package = "tscount")
 
 ## -- Step 2. Exploring and preparing the data
 ## pull response variable
-data <- ecoli %>%
+y <- ecoli %>%
   dplyr::pull(cases)
 
+# y <- ecoli %>%
+#   dplyr::filter(year <= 2009) %>%
+#   dplyr::pull(cases)
+
 ## create time series variable
-data <- ts(data, start = c(2001, 1), end = c(2013, 20), frequency = 52)
+y2 <- ts(y, start = c(2001, 1), end = c(2013, 20), frequency = 52)
 
 ## Visualizing the data
-plot(data, xlab='Date', ylab='Number of Cases', col='darkblue')
+plot(y2, xlab='Date', ylab='Number of Cases', col='darkblue')
 
 ## partial autocorrelation plot (ACF)
-pacf(data)
+pacf(y2)
 
 ## derive lag variables
-data <- zoo::as.zoo(data)
+data_unstd <- lag_calculator(y = y, n_lags = 4)
+# data_std <- lag_calculator(y = y, n_lags = 4, scale = TRUE, scale_type = "range")
 
-x1 <- quantmod::Lag(x = data, k = 1)
-x2 <- quantmod::Lag(x = data, k = 2)
-x3 <- quantmod::Lag(x = data, k = 3)
-x4 <- quantmod::Lag(x = data, k = 4)
 
-x <- cbind(x1, x2, x3, x4)
+## -- Step 3. Training a Model on the Data
+# data <- data_unstd
+data <- data_unstd 
 
-## remove missing values (due to lag computation)
-x <- x[-(1:4), ]
+## partition dataset for training/testing
+set.seed(pi)
+
+myTimeControl <- trainControl(method = "timeslice", 
+                              initialWindow = 40, 
+                              horizon = 12, 
+                              fixedWindow = TRUE)
+
+# m1 <- caret::train(y ~ ., data = data, method = "nnet", linout=TRUE, trace=FALSE)
+m2 <- caret::train(y ~ ., data = data, 
+                   method = "neuralnet", 
+                   preProc = c("center", "scale"), 
+                   hidden = c(10, 2),
+                   trControl = myTimeControl
+                   # ,  
+                   # algorithm = 'backprop', learningrate = 0.25, hidden = 3, linout = TRUE
+                   )
+
+## using pkg::forecast
+m3 <- forecast::nnetar(y = y, lambda = 0.5)
+m3
+
+sim <- ts(matrix(0, nrow=20, ncol=9), start=end(y)[1]+1)
+for(i in seq(9))
+  sim[,i] <- simulate(m3, nsim=20)
+
+library(ggplot2)
+autoplot(y) + forecast::autolayer(sim)
+
+## prediction
+pred_m1 <- predict(m1, data)
+
+## Examine results
+pred_m1_ts <- ts(pred_m1, start = c(2001, 1), end = c(2013, 20), frequency = 52)
+
+plot(y2, xlab='Date', ylab='Number of Cases', col='2')
+lines(pred_m1_ts, col=3)
+# legend(5, 70, c("y", "pred"), cex=1.5, fill=2:3)
 
