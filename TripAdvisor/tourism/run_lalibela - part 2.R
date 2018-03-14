@@ -56,11 +56,16 @@ donotrun_prep2 <- function() {
   user_loc_lalibela <- get_geoLocation(dsin = lalibela_prep1, place_type = "user_location")
   
   ## Save user location data
-  readr::write_csv(x = user_loc_lalibela, path = "./output/part 2/user_loc_lalibela.csv", col_names = T)
+  fname_out <- file.path(paste("./output/part 2/user_loc_lalibela_", Sys.Date(), ".csv", sep = ""))
+  
+  readr::write_csv(x = user_loc_lalibela, path = fname_out, col_names = T)
 }
 
 ## -- Merge dataset
 user_loc_lalibela <- readr::read_csv(file = "./output/part 2/user_loc_lalibela.csv", col_names = TRUE)
+
+## get city/country
+qwe <- user_loc_lalibela[1:2,]
 
 ## -- add geo-location info to main analysis dataset
 lalibela_prep2 <- sqldf("SELECT A.*, B.lon_user_location, B.lat_user_location
