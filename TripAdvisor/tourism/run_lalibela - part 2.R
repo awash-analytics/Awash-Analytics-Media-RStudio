@@ -7,7 +7,7 @@
 ######################################################
 
 ## load library
-source("./load library.R")
+source("./functions/load library.R")
 
 ## load custom functions
 source("./functions/get_geoLocation.R")
@@ -20,12 +20,14 @@ lalibela_raw <- readr::read_csv(file = "./output/rawdata/reviews_TripAdvisor-lal
 ##################################
 ## Step 2. Preprocess data.     ##
 ##################################
-## -- keep only records whose user location is known
+## -- preprocess user location
 lalibela_flt <- lalibela_raw %>% 
-  dplyr::filter(!is.na(user_location)) %>% 
+  dplyr::filter(!is.na(user_location)) %>%    ## keep only records whose user location is known
+  dplyr::mutate(user_location_tmp = user_location) %>%     ## get copy of user location
+  dplyr::mutate(user_location = unlist(stringr::str_extract_all(string = user_location_tmp, pattern = "\\D+"))) %>%   ## drop numeric values, important to find the lon/lat of user location
   dplyr::select(attraction_location, title, date, user_location, date_dataAccess)
 
-## -- preprocess date variable
+## -- preprocess date values
 lalibela_prep1 <- lalibela_flt %>% 
   dplyr::mutate(date_raw = as.Date(date, format = "%B%d,%Y")) %>% 
   dplyr::filter(!is.na(date_raw)) %>%         ## drop records with latest reviews (e.g., date = 4 days ago)
@@ -44,7 +46,8 @@ lalibela_prep1 <- lalibela_flt %>%
 ## -- 2. https://developers.google.com/maps/documentation/geocoding/get-api-key?refresh=1
 ## --------------------------------------------------------------------------------------------------------------- ##
 donotrun_prep2 <- function() {
-  google_api <- readLines(con = "./../../../api/ggmap_geocode_api.txt")
+  # google_api <- readLines(con = "./../../../api/ggmap_geocode_api.txt")
+  google_api <- readLines(con = file.choose())
   
   ## Register api
   ggmap::register_google(key = google_api)
@@ -55,24 +58,31 @@ donotrun_prep2 <- function() {
   ## Get latitude/longitude for user location
   user_loc_lalibela <- get_geoLocation(dsin = lalibela_prep1, place_type = "user_location")
   
+  ## -- Drop unknown country (e.g., user_location = "europe")
+  user_loc_lalibela_flt <- user_loc_lalibela %>% 
+    dplyr::filter(!Country == "NA")
+  
   ## Save user location data
   fname_out <- file.path(paste("./output/part 2/user_loc_lalibela_", Sys.Date(), ".csv", sep = ""))
   
-  readr::write_csv(x = user_loc_lalibela, path = fname_out, col_names = T)
+  readr::write_csv(x = user_loc_lalibela_flt, path = fname_out, col_names = T)
 }
 
-## -- Merge dataset
-user_loc_lalibela <- readr::read_csv(file = "./output/part 2/user_loc_lalibela.csv", col_names = TRUE)
+## -- Merge dataset, add geo-location info to the main analysis dataset
+user_loc_lalibela <- readr::read_csv(file = file.choose(), col_names = TRUE)
 
-## get city/country
-qwe <- user_loc_lalibela[1:2,]
+lalibela_prep2 <- lalibela_prep1 %>% 
+  dplyr::left_join(user_loc_lalibela, by = "user_location")
 
-## -- add geo-location info to main analysis dataset
-lalibela_prep2 <- sqldf("SELECT A.*, B.lon_user_location, B.lat_user_location
-                         FROM lalibela_prep1 AS A 
-                         LEFT JOIN user_loc_lalibela AS B 
-                         ON A.user_location = B.user_location")
+## -- drop unknown lon/lat (e.g., user_location = "europe")
+lalibela_prep3 <- lalibela_prep2 %>% 
+  dplyr::filter( !is.na(lon_user_location) | !is.na(lat_user_location) )
 
-##################################
-## Step 3. Visualization.       ##
-##################################
+## Save the final (preprocessed) dataset for later analysis in Episode 3 (i.e., visualization)
+fname_out <- file.path(paste("./output/part 2/lalibela_preprocessed_", Sys.Date(), ".csv", sep = ""))
+
+readr::write_csv(x = lalibela_prep3, path = fname_out)
+
+
+
+

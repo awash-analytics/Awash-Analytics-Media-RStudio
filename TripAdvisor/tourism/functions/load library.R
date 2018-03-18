@@ -8,4 +8,4 @@ library(digest)        ## dependence package for ggmap from GitHub
 # devtools::install_github("dkahle/ggmap")
 library(ggmap)         ## to get latitude/longitude of user location
 
-library(sqldf)
+# library(sqldf)

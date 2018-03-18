@@ -1,4 +1,7 @@
 
+test <- data.frame(user_location = c("hong kong", "Brussels, Belgium", "Dominika"))
+
+
 defects_long <- user_loc_lalibela %>% 
   dplyr::filter(is.na(lon_user_location) | is.na(City)) %>% 
   print()
