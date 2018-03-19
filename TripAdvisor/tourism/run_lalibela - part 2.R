@@ -49,14 +49,15 @@ donotrun_prep2 <- function() {
   # google_api <- readLines(con = "./../../../api/ggmap_geocode_api.txt")
   google_api <- readLines(con = file.choose())
   
-  ## Register api
+  ## Register API
   ggmap::register_google(key = google_api)
   
   # ## filter user location
   # lalibela_prep1$user_location_splt <- stringr::str_split_fixed(string = lalibela_prep1$user_location, pattern = "\\,", n = 2)
   
   ## Get latitude/longitude for user location
-  user_loc_lalibela <- get_geoLocation(dsin = lalibela_prep1, place_type = "user_location")
+  user_loc_lalibela <- get_geoLocation(dsin = lalibela_prep1, 
+                                       user_location = "user_location")
   
   ## -- Drop unknown country (e.g., user_location = "europe")
   user_loc_lalibela_flt <- user_loc_lalibela %>% 

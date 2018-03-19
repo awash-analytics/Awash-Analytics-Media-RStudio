@@ -1,0 +1,177 @@
+---
+title: 'Mining Lalibela: Part 2'
+author: "Awash Analytics"
+date: "3/19/2018"
+output: html_document
+---
+
+
+<style type="text/css">
+
+h1.title {
+  font-size: 38px;
+  color: DarkRed;
+  text-align: center;
+}
+h4.author { /* Header 4 - and the author and data headers use this too  */
+    font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkRed;
+  text-align: center;
+}
+h4.date { /* Header 4 - and the author and data headers use this too  */
+  font-size: 18px;
+  font-family: "Times New Roman", Times, serif;
+  color: DarkBlue;
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+div.screenshot {
+  width: 950px;
+  height: 350px;
+  margin-top: 30px;
+  margin-bottom: 125px;
+}
+
+p {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+div.img {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+div.myCaption {
+  margin-top: 10px;
+  margin-bottom: 3px;
+}
+
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+<div id="intro">
+<!-- <h4>1. Introduction</h4> -->
+## Introduction
+
+<p>
+This post is the second series on Mining Lalibela using R. In the <a target="_blank" href="http://rpubs.com/haile/mining-lalibela-part-1">first episode</a>, I showed you how to scrape web data using the ``rvest`` package in R. In this series our focus will be on how to preprocess, sometimes known as <a target="_blank" href="http://qr.ae/TU1p4V">data wrangling</a>, the raw dataset that were pulled from TripAdvisor last time. Data wrangling is a must-to-have skill by every data scientist and is an important step that transforms our raw dataset to ready for analysis. The source codes of this series are available on <a target="_blank" href="https://github.com/awash-analytics/Awash-Analytics-Media-RStudio/tree/master/TripAdvisor/tourism">GitHub</a>.
+</p>
+
+</div> <!-- end introduction -->
+
+
+
+<div id="run_lalibelaP2-area">
+
+## The Main program (run_lalibela - part 2.R)
+
+```{r, eval=FALSE, message=F, warning=F}
+######################################################
+## Minining Lalibela (Part 2) by Awash Analytics.   ##
+## ------------------------------------------------ ##
+## Blog: http://awash-analytics.info                ##
+## ------------------------------------------------ ##
+## Date: March 2018.                                ##
+######################################################
+
+## ------------------ ##
+## load library.      ##
+## ------------------ ##
+library(tidyverse)     ## a data science framework
+library(devtools)      ## for installing packages from GitHub
+library(lubridate)     ## for manipulating date/time
+library(stringr)       ## for string manipulation
+library(digest)        ## dependence package for ggmap from GitHub
+library(ggmap)         ## to get lon/lat of user location. Installation: devtools::install_github("dkahle/ggmap")
+
+## -------------------------- ##
+## load custom functions.     ##
+## -------------------------- ##
+source("./functions/get_geoLocation.R")
+
+##################################
+## Step 1. Import raw dataset.  ##
+##################################
+lalibela_raw <- readr::read_csv(file = "./output/rawdata/reviews_TripAdvisor-lalibela_December_22_2017.csv", col_names = T)
+
+##################################
+## Step 2. Preprocess data.     ##
+##################################
+## -- preprocess user location
+lalibela_flt <- lalibela_raw %>% 
+  dplyr::filter(!is.na(user_location)) %>%    ## keep only records whose user location is known
+  dplyr::mutate(user_location_tmp = user_location) %>%     ## get copy of user location
+  dplyr::mutate(user_location = unlist(stringr::str_extract_all(string = user_location_tmp, pattern = "\\D+"))) %>%   ## drop numeric values, important to find the lon/lat of user location
+  dplyr::select(attraction_location, title, date, user_location, date_dataAccess)
+
+## -- preprocess date values
+lalibela_prep1 <- lalibela_flt %>% 
+  dplyr::mutate(date_raw = as.Date(date, format = "%B%d,%Y")) %>% 
+  dplyr::filter(!is.na(date_raw)) %>%         ## drop records with latest reviews (e.g., date = 4 days ago)
+  dplyr::select(-date) %>% 
+  dplyr::mutate(year = lubridate::year(date_raw)) %>% 
+  dplyr::mutate(month = lubridate::month(date_raw)) %>% 
+  dplyr::mutate(day = lubridate::day(date_raw)) 
+
+## --------------------------------------------------------------------------------- ##
+## -- preprocess user location (i.e., get latitude/longitude for user location).     ##
+## Get an API Key from the Google API Console                                        ##
+## --------------------------------------------------------------------------------- ##
+## ----------------------------------------------------------------------------------------------------------- ##
+## -- source:                                                                   
+## -- 1. https://stackoverflow.com/questions/36175529/getting-over-query-limit-after-one-request-with-geocode
+## -- 2. https://developers.google.com/maps/documentation/geocoding/get-api-key?refresh=1
+## ----------------------------------------------------------------------------------------------------------- ##
+
+## Get Google API keys
+google_api <- readLines(con = file.choose())
+
+## Register the key
+ggmap::register_google(key = google_api)
+
+## Get latitude/longitude for user location
+user_loc_lalibela <- get_geoLocation(dsin = lalibela_prep1, 
+                                     user_location = "user_location")
+
+## -- Drop unknown country (e.g., user_location = "europe")
+user_loc_lalibela_flt <- user_loc_lalibela %>% 
+  dplyr::filter(!Country == "NA")
+
+## -------------------------- ##
+## Save user location data.   ##
+## -------------------------- ##
+fname_out <- file.path(paste("./output/part 2/user_loc_lalibela_", Sys.Date(), ".csv", sep = ""))
+
+readr::write_csv(x = user_loc_lalibela_flt, path = fname_out, col_names = T)
+
+## --------------------------------------------------------------------- ##
+## Merge dataset, add geo-location info to the main analysis dataset.    ##
+## --------------------------------------------------------------------- ##
+user_loc_lalibela <- readr::read_csv(file = file.choose(), col_names = TRUE)
+
+lalibela_prep2 <- lalibela_prep1 %>% 
+  dplyr::left_join(user_loc_lalibela, by = "user_location")
+
+## -- drop unknown lon/lat (e.g., user_location = "europe")
+lalibela_prep3 <- lalibela_prep2 %>% 
+  dplyr::filter( !is.na(lon_user_location) | !is.na(lat_user_location) )
+
+## ------------------------------------------------------------------------- ##
+## Save the final (preprocessed) dataset for later analysis in Episode 3.    ##
+## ------------------------------------------------------------------------- ##
+fname_out <- file.path(paste("./output/part 2/lalibela_preprocessed_", Sys.Date(), ".csv", sep = ""))
+
+readr::write_csv(x = lalibela_prep3, path = fname_out)
+```
+
+
+
+</div> <!-- end run_lalibelaP2-area -->
