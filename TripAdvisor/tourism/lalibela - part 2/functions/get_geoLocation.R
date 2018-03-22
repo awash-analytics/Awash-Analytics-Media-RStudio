@@ -74,7 +74,7 @@ get_geoLocation <- function (dsin = NULL, user_location = NULL) {
   colnames(geo_res) <- c(user_location, 
                          paste("lon", "_", user_location, sep = ""), 
                          paste("lat", "_", user_location, sep = ""),
-                         "City", "Country")
+                         "city", "country")
   
   ## Change factor variables to character, if required
   geo_res_final <- geo_res %>% 

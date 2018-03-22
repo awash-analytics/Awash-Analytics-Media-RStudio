@@ -173,10 +173,19 @@ div.myCaption {
 <!-- <h4>1. Introduction</h4> -->
 <h2 id="introduction">Introduction</h2>
 <p>
-This post is the second series on Mining Lalibela using R. In the <a target="_blank" href="http://rpubs.com/haile/mining-lalibela-part-1">first episode</a>, I showed you how to scrape web data using the <code>rvest</code> package in R. In this series our focus will be on how to preprocess, sometimes known as <a target="_blank" href="http://qr.ae/TU1p4V">data wrangling</a>, the raw dataset that were pulled from TripAdvisor last time. Data wrangling is a must-to-have skill by every data scientist and is an important step that transforms our raw dataset to ready for analysis. The source codes of this series are available on <a target="_blank" href="https://github.com/awash-analytics/Awash-Analytics-Media-RStudio/tree/master/TripAdvisor/tourism">GitHub</a>.
+This post is the second series on Mining Lalibela using R. In the <a target="_blank" href="http://rpubs.com/haile/mining-lalibela-part-1">first episode</a>, I showed you how to scrape web data using the <code>rvest</code> package in R. In this series our focus will be on how to preprocess, sometimes known as <a target="_blank" href="http://qr.ae/TU1p4V">data wrangling</a>, the raw dataset that were pulled from TripAdvisor last time. Data wrangling is a must-to-have skill for every data scientist and is an important step that transforms the raw data to ready for analysis dataset. All the source codes used in this post are available on <a target="_blank" href="https://github.com/awash-analytics/Awash-Analytics-Media-RStudio/tree/master/TripAdvisor/tourism">GitHub</a>.
 </p>
 </div>
 <p><!-- end introduction --></p>
+<pre class="r"><code>## ------------------ ##
+## load library.      ##
+## ------------------ ##
+library(tidyverse)     ## a data science framework
+library(devtools)      ## for installing packages from GitHub
+library(lubridate)     ## for manipulating date/time
+library(stringr)       ## for string manipulation
+library(digest)        ## dependence package for ggmap from GitHub
+library(ggmap)         ## to get lon/lat of user location. Installation: devtools::install_github(&quot;dkahle/ggmap&quot;)</code></pre>
 <div id="run_lalibelaP2-area">
 <h2 id="the-main-program-run_lalibela---part-2.r">The Main program (run_lalibela - part 2.R)</h2>
 <pre class="r"><code>######################################################
@@ -187,15 +196,6 @@ This post is the second series on Mining Lalibela using R. In the <a target="_bl
 ## Date: March 2018.                                ##
 ######################################################
 
-## ------------------ ##
-## load library.      ##
-## ------------------ ##
-library(tidyverse)     ## a data science framework
-library(devtools)      ## for installing packages from GitHub
-library(lubridate)     ## for manipulating date/time
-library(stringr)       ## for string manipulation
-library(digest)        ## dependence package for ggmap from GitHub
-library(ggmap)         ## to get lon/lat of user location. Installation: devtools::install_github(&quot;dkahle/ggmap&quot;)
 
 ## -------------------------- ##
 ## load custom functions.     ##

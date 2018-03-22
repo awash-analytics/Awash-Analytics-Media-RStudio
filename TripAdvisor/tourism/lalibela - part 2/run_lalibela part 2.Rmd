@@ -62,26 +62,14 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Introduction
 
 <p>
-This post is the second series on Mining Lalibela using R. In the <a target="_blank" href="http://rpubs.com/haile/mining-lalibela-part-1">first episode</a>, I showed you how to scrape web data using the ``rvest`` package in R. In this series our focus will be on how to preprocess, sometimes known as <a target="_blank" href="http://qr.ae/TU1p4V">data wrangling</a>, the raw dataset that were pulled from TripAdvisor last time. Data wrangling is a must-to-have skill by every data scientist and is an important step that transforms our raw dataset to ready for analysis. The source codes of this series are available on <a target="_blank" href="https://github.com/awash-analytics/Awash-Analytics-Media-RStudio/tree/master/TripAdvisor/tourism">GitHub</a>.
+This post is the second series on Mining Lalibela using R. In the <a target="_blank" href="http://rpubs.com/haile/mining-lalibela-part-1">first episode</a>, I showed you how to scrape web data using the ``rvest`` package in R. In this series our focus will be on how to preprocess, sometimes known as <a target="_blank" href="http://qr.ae/TU1p4V">data wrangling</a>, the raw dataset that were pulled from TripAdvisor last time. Data wrangling is a must-to-have skill for every data scientist and is an important step that transforms the raw data to ready for analysis dataset. All the source codes used in this post are available on <a target="_blank" href="https://github.com/awash-analytics/Awash-Analytics-Media-RStudio/tree/master/TripAdvisor/tourism">GitHub</a>.
 </p>
 
 </div> <!-- end introduction -->
 
 
 
-<div id="run_lalibelaP2-area">
-
-## The Main program (run_lalibela - part 2.R)
-
 ```{r, eval=FALSE, message=F, warning=F}
-######################################################
-## Minining Lalibela (Part 2) by Awash Analytics.   ##
-## ------------------------------------------------ ##
-## Blog: http://awash-analytics.info                ##
-## ------------------------------------------------ ##
-## Date: March 2018.                                ##
-######################################################
-
 ## ------------------ ##
 ## load library.      ##
 ## ------------------ ##
@@ -92,10 +80,24 @@ library(stringr)       ## for string manipulation
 library(digest)        ## dependence package for ggmap from GitHub
 library(ggmap)         ## to get lon/lat of user location. Installation: devtools::install_github("dkahle/ggmap")
 
-## -------------------------- ##
-## load custom functions.     ##
-## -------------------------- ##
+```
+
+
+
+
+
+```{r, eval=FALSE, message=F, warning=F}
+## load function that 
 source("./functions/get_geoLocation.R")
+```
+
+
+<div id="run_lalibelaP2-area">
+
+## The Main program (run_lalibela - part 2.R)
+
+```{r, eval=FALSE, message=F, warning=F}
+
 
 ##################################
 ## Step 1. Import raw dataset.  ##
