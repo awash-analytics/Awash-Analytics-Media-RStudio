@@ -1,0 +1,12 @@
+name: hello_world_-_rshiny
+title: Hello World - RShiny
+username:
+account: myfirstapps
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 306914
+bundleId: 1286200
+url: https://myfirstapps.shinyapps.io/hello_world_-_rshiny/
+when: 1521918042.87423
+asMultiple: FALSE
+asStatic: FALSE
