@@ -12,6 +12,7 @@ library(shinydashboard)
 library(ggplot2)
 
 
+
 ## load my plot function
 makePlot <- function(x, y) {
   plot(x, y)
