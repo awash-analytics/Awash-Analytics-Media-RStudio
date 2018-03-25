@@ -1,4 +1,3 @@
 exportPattern("^[[:alpha:]]+")
-export(load_lalibelaLib)
 export(get_10Reviews)
 export(get_allReviews)

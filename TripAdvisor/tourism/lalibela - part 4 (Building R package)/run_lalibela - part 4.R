@@ -27,6 +27,15 @@ devtools::check()
 
 ## STEP-8: Build binary package
 ## -- Go to 'Build', then click 'More' -> 'Build Binary package'
+# devtools::build(binary = TRUE, args = c('--preclean'))    ## other option
+
+## STEP-9: For Windows user, .tar.gz folder should be created
+## - source: https://github.com/chrisadolph/tile-simcf/wiki/Building-R-packages-for-PC,-Mac,-and-Linux-or-Unix
+## STEP-9a: Go to the terminal and run the command below. This creates, .tar.gz folder for Windows user
+## - In case, R command is not recognized by mac, do the ff:
+##   1. Get the path for R.exe file by running this command in RStudio, > R.home()
+##   2. Then, go to the terminal and paste the path using this command, > export PATH="/Library/Frameworks/R.framework/Resources:$PATH"
+## > R CMD BUILD lalibela/
 
 
 

@@ -5,13 +5,6 @@
 #' @param nbr_page the number of pages to grab.
 #' @param site_gCode the "g" code as defined by TripAdvisor pagination. Please see the example below.
 #' @param site_dCode the "d" code as defined by TripAdvisor pagination. Please see the example below.
-#'
-#' Extracts reviews of an attraction site posted by tourists on TripAdvisor website.
-#' It takes care of both a single page and multiple pages.
-#'
-#' @param nbr_page the number of pages to grab.
-#' @param site_gCode the "g" code as defined by TripAdvisor pagination. Please see the example below.
-#' @param site_dCode the "d" code as defined by TripAdvisor pagination. Please see the example below.
 #' @param site_name the name of an attraction site.
 #' @param site_geoLocation the geographical location of an attraction site. Not that this is not related to a latitude/longitude values. Please see the example below.
 #'
@@ -35,9 +28,6 @@ get_allReviews <- function(nbr_page = NULL,
                            site_name = NULL, site_geoLocation = NULL) {
 
   message("Page extraction is started: ", date())
-  
-  ## Check for dependence libraries
-  load_lalibelaLib()
 
   ## Main TripAdvisor URL
   TripAdvisor_url <- "https://www.tripadvisor.com"

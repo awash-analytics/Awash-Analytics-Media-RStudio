@@ -13,20 +13,11 @@ get_allReviews(nbr_page = NULL, site_gCode = NULL, site_dCode = NULL,
 
 \item{site_gCode}{the "g" code as defined by TripAdvisor pagination. Please see the example below.}
 
-\item{site_dCode}{the "d" code as defined by TripAdvisor pagination. Please see the example below.
-
-Extracts reviews of an attraction site posted by tourists on TripAdvisor website.
-It takes care of both a single page and multiple pages.}
+\item{site_dCode}{the "d" code as defined by TripAdvisor pagination. Please see the example below.}
 
 \item{site_name}{the name of an attraction site.}
 
 \item{site_geoLocation}{the geographical location of an attraction site. Not that this is not related to a latitude/longitude values. Please see the example below.}
-
-\item{nbr_page}{the number of pages to grab.}
-
-\item{site_gCode}{the "g" code as defined by TripAdvisor pagination. Please see the example below.}
-
-\item{site_dCode}{the "d" code as defined by TripAdvisor pagination. Please see the example below.}
 }
 \description{
 This source code calls get_10Reviews.R program to extract the required components (e.g., review title, date, device). Depending on
